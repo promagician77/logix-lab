@@ -1,0 +1,345 @@
+{
+ "clean": {
+  "lint": [],
+  "failing": []
+ },
+ "bugs": [
+  {
+   "id": "B-1",
+   "title": "Alternator rewritten as a one-rung toggle",
+   "symptom": "After the first cycle P2 leads every time; P1 sits idle and P2 wears out.",
+   "fix": "Toggle with a value (ADD and wrap, or XOR), or split into separate rungs; never OTU then OTL the same bit in parallel legs.",
+   "lint": [
+    {
+     "rule": "TOGGLE_ONE_RUNG",
+     "severity": "error",
+     "where": "MainProgram/R03_LeadLag rung 8",
+     "detail": "Lead_IsP2"
+    }
+   ],
+   "failing": [
+    {
+     "id": "F1",
+     "basic": false,
+     "msg": "lead order P1,P2,P2"
+    },
+    {
+     "id": "F14",
+     "basic": false,
+     "msg": "starts P1 3 vs P2 20"
+    },
+    {
+     "id": "F16",
+     "basic": false,
+     "msg": "starts P1 1, P2 2"
+    },
+    {
+     "id": "F3b",
+     "basic": false,
+     "msg": "sequence incomplete"
+    },
+    {
+     "id": "F4b",
+     "basic": false,
+     "msg": "P2 not lead"
+    },
+    {
+     "id": "F27",
+     "basic": false,
+     "msg": "P2 not lead"
+    }
+   ]
+  },
+  {
+   "id": "B-2",
+   "title": "Jog rung added for commissioning and left in",
+   "symptom": "Pump 1 never runs in AUTO: the jog rung, scanned later, writes the output off every scan.",
+   "fix": "One OTE per output: put the jog in the command logic (branch) or use a mode, not a second output rung.",
+   "lint": [
+    {
+     "rule": "DUP_OTE",
+     "severity": "error",
+     "where": "MainProgram/R30_Outputs rung 0; MainProgram/R30_Outputs rung 1",
+     "detail": "DO_P1_Run"
+    },
+    {
+     "rule": "HMI_NO_HANDSHAKE",
+     "severity": "warning",
+     "where": "MainProgram/R30_Outputs rung 1",
+     "detail": "HMI_P1_Jog"
+    }
+   ],
+   "failing": [
+    {
+     "id": "B3",
+     "basic": true,
+     "msg": "lag started at 56.05 %"
+    },
+    {
+     "id": "B4",
+     "basic": true,
+     "msg": "P1 not running before trip"
+    },
+    {
+     "id": "F1",
+     "basic": false,
+     "msg": "lead order P2,P2,P2"
+    },
+    {
+     "id": "F6",
+     "basic": false,
+     "msg": "backup should run both pumps"
+    },
+    {
+     "id": "F14",
+     "basic": false,
+     "msg": "max level 100.0 %"
+    },
+    {
+     "id": "F16",
+     "basic": false,
+     "msg": "starts P1 0, P2 3"
+    },
+    {
+     "id": "F18",
+     "basic": false,
+     "msg": "stopped at 54.31 %"
+    },
+    {
+     "id": "F20",
+     "basic": false,
+     "msg": "P1 did not lead"
+    },
+    {
+     "id": "F3b",
+     "basic": false,
+     "msg": "sequence incomplete"
+    },
+    {
+     "id": "F4b",
+     "basic": false,
+     "msg": "P1 did not take over"
+    },
+    {
+     "id": "F21",
+     "basic": false,
+     "msg": "unexpected ALM_P1_Fault"
+    },
+    {
+     "id": "F25",
+     "basic": false,
+     "msg": "backup did not start both pumps"
+    },
+    {
+     "id": "F28",
+     "basic": false,
+     "msg": "both pumps should run"
+    }
+   ]
+  },
+  {
+   "id": "B-3",
+   "title": "Acknowledge button without the PLC handshake",
+   "symptom": "If the HMI drops its connection mid-press, the ack bit stays set and every new alarm is acknowledged silently: the beacon never comes on.",
+   "fix": "PLC clears HMI request bits after use (OTU), and clears them all on first scan.",
+   "lint": [
+    {
+     "rule": "HMI_NO_HANDSHAKE",
+     "severity": "warning",
+     "where": "MainProgram/R20_Alarms rung 12",
+     "detail": "HMI_AckAll"
+    }
+   ],
+   "failing": [
+    {
+     "id": "F13",
+     "basic": false,
+     "msg": "ack not handled"
+    },
+    {
+     "id": "F17",
+     "basic": false,
+     "msg": "request bits survived first scan"
+    },
+    {
+     "id": "F22",
+     "basic": false,
+     "msg": "ALM_HighLevel not unacknowledged / no beacon"
+    }
+   ]
+  },
+  {
+   "id": "B-4",
+   "title": "Start counter copied from pump 1, one-shot tag not renamed",
+   "symptom": "Pump 2's start count climbs every scan while it runs (thousands of starts per cycle).",
+   "fix": "Every ONS/OSR/OSF needs its own storage bit; UDT members make that automatic.",
+   "lint": [
+    {
+     "rule": "EDGE_SHARED",
+     "severity": "error",
+     "where": "MainProgram/R10_Pump1 rung 10; MainProgram/R11_Pump2 rung 10",
+     "detail": "P1.Start_ONS"
+    }
+   ],
+   "failing": [
+    {
+     "id": "F14",
+     "basic": false,
+     "msg": "starts P1 121472 vs P2 78802"
+    },
+    {
+     "id": "F16",
+     "basic": false,
+     "msg": "starts P1 72065, P2 36032"
+    }
+   ]
+  },
+  {
+   "id": "B-5",
+   "title": "Run hours from a self-resetting 1 s timer in the continuous task",
+   "symptom": "Run hours read low, and the error grows with scan time, so maintenance intervals slip.",
+   "fix": "Count in a periodic task (as shipped), or accumulate the timer's elapsed time rather than restarting it.",
+   "lint": [
+    {
+     "rule": "SELF_RESET_TIMER",
+     "severity": "warning",
+     "where": "MainProgram/R10_Pump1 rung 11",
+     "detail": "P1_SecTmr"
+    }
+   ],
+   "failing": [
+    {
+     "id": "F14",
+     "basic": false,
+     "msg": "run seconds 6797/5347 vs running 7483/5350 s"
+    },
+    {
+     "id": "F15",
+     "basic": false,
+     "msg": "P1 run seconds over 2 h: got 6943, expected 7200 ± 1"
+    }
+   ]
+  },
+  {
+   "id": "B-6",
+   "title": "Fail-to-start timer missing the feedback check",
+   "symptom": "Every pump faults 5 s after every start, then the other pump starts and faults too.",
+   "fix": "Time only 'commanded and not running': XIC(Cmd_Run) XIO(RunFbk).",
+   "lint": [],
+   "failing": [
+    {
+     "id": "B2",
+     "basic": true,
+     "msg": "lead call never dropped"
+    },
+    {
+     "id": "B3",
+     "basic": true,
+     "msg": "lag started at 55.35 %"
+    },
+    {
+     "id": "B4",
+     "basic": true,
+     "msg": "P1 not running before trip"
+    },
+    {
+     "id": "F1",
+     "basic": false,
+     "msg": "cycle 3 did not start"
+    },
+    {
+     "id": "F6",
+     "basic": false,
+     "msg": "backup should run both pumps"
+    },
+    {
+     "id": "F7",
+     "basic": false,
+     "msg": "disagreement not detected"
+    },
+    {
+     "id": "F13",
+     "basic": false,
+     "msg": "new alarm auto-acknowledged"
+    },
+    {
+     "id": "F14",
+     "basic": false,
+     "msg": "max level 100.0 %"
+    },
+    {
+     "id": "F16",
+     "basic": false,
+     "msg": "starts P1 1, P2 1"
+    },
+    {
+     "id": "F18",
+     "basic": false,
+     "msg": "stopped at 55.64 %"
+    },
+    {
+     "id": "F4b",
+     "basic": false,
+     "msg": "P2 not lead"
+    },
+    {
+     "id": "F21",
+     "basic": false,
+     "msg": "unexpected ALM_P1_Fault"
+    },
+    {
+     "id": "F25",
+     "basic": false,
+     "msg": "backup did not pump down to the low float"
+    },
+    {
+     "id": "F26",
+     "basic": false,
+     "msg": "reset accepted while still disagreeing, or request left set"
+    },
+    {
+     "id": "F27",
+     "basic": false,
+     "msg": "P1 did not start as lag"
+    },
+    {
+     "id": "F28",
+     "basic": false,
+     "msg": "both pumps should run"
+    }
+   ]
+  }
+ ],
+ "drift": [
+  {
+   "scan_ms": 2,
+   "periodic": 3600,
+   "self_reset": 3586,
+   "self_reset_error_pct": -0.39
+  },
+  {
+   "scan_ms": 5,
+   "periodic": 3600,
+   "self_reset": 3564,
+   "self_reset_error_pct": -1
+  },
+  {
+   "scan_ms": 10,
+   "periodic": 3600,
+   "self_reset": 3530,
+   "self_reset_error_pct": -1.94
+  },
+  {
+   "scan_ms": 20,
+   "periodic": 3600,
+   "self_reset": 3462,
+   "self_reset_error_pct": -3.83
+  },
+  {
+   "scan_ms": 50,
+   "periodic": 3600,
+   "self_reset": 3273,
+   "self_reset_error_pct": -9.08
+  }
+ ]
+}

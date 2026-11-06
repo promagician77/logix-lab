@@ -1,0 +1,10 @@
+Trigger (direct reference),Message,Acknowledge,Notes
+{[PLC]ALM_HighLevel.Active},Wet well high level,{[PLC]HMI_AckAll} (PLC clears),Unack state: {[PLC]ALM_HighLevel.Unack}
+{[PLC]ALM_HiHiFloat.Active},High-high float,{[PLC]HMI_AckAll} (PLC clears),Unack state: {[PLC]ALM_HiHiFloat.Unack}
+{[PLC]ALM_LT101.Active},Level transmitter LT-101 failed or disagrees with floats,{[PLC]HMI_AckAll} (PLC clears),Unack state: {[PLC]ALM_LT101.Unack}
+{[PLC]ALM_P1_Fault.Active},Pump 1 fault,{[PLC]HMI_AckAll} (PLC clears),Unack state: {[PLC]ALM_P1_Fault.Unack}
+{[PLC]ALM_P2_Fault.Active},Pump 2 fault,{[PLC]HMI_AckAll} (PLC clears),Unack state: {[PLC]ALM_P2_Fault.Unack}
+{[PLC]ALM_P1_Uncmd.Active},Pump 1 running without command,{[PLC]HMI_AckAll} (PLC clears),Unack state: {[PLC]ALM_P1_Uncmd.Unack}
+{[PLC]ALM_P2_Uncmd.Active},Pump 2 running without command,{[PLC]HMI_AckAll} (PLC clears),Unack state: {[PLC]ALM_P2_Uncmd.Unack}
+{[PLC]ALM_NoPump.Active},No pump available,{[PLC]HMI_AckAll} (PLC clears),Unack state: {[PLC]ALM_NoPump.Unack}
+{[PLC]ALM_SPInvalid.Active},Level setpoints rejected,{[PLC]HMI_AckAll} (PLC clears),Unack state: {[PLC]ALM_SPInvalid.Unack}

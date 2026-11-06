@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>LS-01 ladder program and test bench</title>
+<style>
+@font-face{font-family:Plex;src:url(../site/fonts/ibm-plex-sans-latin-400-normal.woff2);font-weight:400}
+@font-face{font-family:Plex;src:url(../site/fonts/ibm-plex-sans-latin-600-normal.woff2);font-weight:600}
+@font-face{font-family:Plex;src:url(../site/fonts/ibm-plex-sans-latin-700-normal.woff2);font-weight:700}
+@font-face{font-family:PlexMono;src:url(../site/fonts/ibm-plex-mono-latin-400-normal.woff2);font-weight:400}
+@font-face{font-family:PlexMono;src:url(../site/fonts/ibm-plex-mono-latin-600-normal.woff2);font-weight:600}
+@page{size:A4;margin:0}
+*{box-sizing:border-box}
+html,body{margin:0;background:#fff;color:#15191E;font:400 10.2px/1.45 Plex,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+section.pg{width:210mm;height:297mm;overflow:hidden;position:relative;page-break-after:always;padding:0 12mm}
+section.pg:last-child{page-break-after:auto}
+.band{background:#14181D;color:#E6EAEE;margin:0 -12mm;padding:8mm 12mm 5mm}
+.kick{font:600 8.2px PlexMono,monospace;letter-spacing:.06em;text-transform:uppercase;color:#F2A900}
+h1{font:700 21px/1.12 Plex;margin:4px 0 5px;letter-spacing:-.01em}
+.lede{color:#B3BCC6;font-size:10.6px;margin:0;max-width:182mm}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#2B323A;border:1px solid #2B323A;border-radius:4px;overflow:hidden;margin-top:4mm}
+.kpi{background:#1B2026;padding:6px 8px}.kpi b{display:block;font:700 17px/1.1 Plex}.g{color:#3FB97A}.a{color:#F2A900}
+.kpi span{display:block;font-size:8.4px;color:#9AA4AE;margin-top:2px;line-height:1.3}.kpi em{font-style:normal;color:#E6EAEE}
+h2{font:700 13px/1.2 Plex;margin:4mm 0 1.6mm}
+h3{font:600 10.4px/1.3 Plex;margin:0 0 3px}
+.shot{width:100%;display:block;border:1px solid #C9CDD1;border-radius:3px}
+.cap{font-size:8.6px;color:#5A6068;margin-top:2px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:5mm}
+ul{margin:0;padding-left:12px}li{margin-bottom:2px}
+table{width:100%;border-collapse:collapse;font-size:9px}
+th{text-align:left;font:600 7.6px Plex;letter-spacing:.06em;text-transform:uppercase;color:#5A6068;border-bottom:1px solid #C9CDD1;padding:2.5px 4px}
+td{border-bottom:1px solid #E6E8EA;padding:2.6px 4px;vertical-align:top}
+td.n{text-align:right;font-family:PlexMono,monospace;white-space:nowrap}#bugs td:first-child{white-space:nowrap}
+code{font:400 8.4px PlexMono,monospace;background:#EEF0F2;padding:0 2px;border-radius:2px}
+.pill{display:inline-block;font:600 7.6px Plex;padding:0 5px;border-radius:8px;background:#E6E8EA;color:#3A4048;margin:0 1px 1px 0}
+.pill.bad{background:#FBE2DF;color:#A3271D}.pill.warn{background:#FCEFCC;color:#7A5600}.pill.ok{background:#DDF3E6;color:#16693B}
+.box{border:1px solid #C9CDD1;border-radius:4px;padding:2.6mm 3.2mm}
+.chart{position:relative}.chart svg{display:block;width:100%;height:auto}
+.chart .ax text{font:400 8px PlexMono,monospace;fill:#5A6068}.chart .ax line{stroke:#C9CDD1}.chart .grid line{stroke:#EEF0F2}
+.chart .lbl{font:600 8.4px Plex !important;fill:#3A4048}.chart svg text.lbl{font-size:8.4px !important;fill:#3A4048 !important}.tip{display:none}
+.legend{display:flex;gap:10px;font-size:8.6px;color:#3A4048;margin:0 0 2px}.legend i{display:inline-block;width:11px;height:3px;vertical-align:2px;margin-right:4px}
+.foot{position:absolute;left:12mm;right:12mm;bottom:7mm;font-size:8.2px;color:#5A6068;border-top:1px solid #C9CDD1;padding-top:2mm;display:flex;justify-content:space-between}
+.mvn{display:grid;grid-template-columns:1fr 1fr;gap:5mm;font-size:9.2px}.mvn p{margin:0}
+</style></head>
+<body>
+<section class="pg">
+  <div class="band">
+    <div class="kick">Studio 5000 Logix Designer · ladder (RLL) · L5X · ISA-101 HMI · tested in simulation</div>
+    <h1>LS-01 lift station: a ladder program shipped with the tests that prove it</h1>
+    <p class="lede">A duplex lift station program in Studio 5000 L5X: <b data-k="rungs"></b> rungs, two UDTs, a continuous task and a periodic task. It covers lead/lag with alternation, automatic fail-over, NE 43 transmitter checks with float backup, validated HMI setpoints, a templated alarm handler and HMI handshakes. A scan engine runs the L5X file itself against a simulated wet well. Every number below comes from those runs.</p>
+    <div class="kpis">
+      <div class="kpi"><b class="g" data-k="pass"></b><span>scenario tests passing, <em data-k="simh"></em> h of plant time</span></div>
+      <div class="kpi"><b class="g" data-k="full"></b><span>of <em data-k="valid"></em> one-edit bugs caught by the scenarios</span></div>
+      <div class="kpi"><b class="a" data-k="basic"></b><span>caught by a typical 5-point site check</span></div>
+      <div class="kpi"><b class="g" data-k="fts"></b><span>fail-to-start detected / other pump running</span></div>
+    </div>
+  </div>
+  <h2>Live station: the L5X running, ISA-101 overview and online ladder</h2>
+  <img class="shot" src="pdf_live.png">
+  <div class="cap">P-101 overload tripped: the fault latches, the unacknowledged alarm flashes and P-102 takes the lead. The ladder view shows R10_Pump1 online, with green for power flow and true instructions.</div>
+  <div class="two" style="margin-top:3.5mm">
+    <div><h3>In the program</h3><ul>
+      <li><b>R01/R30</b>: I/O mapped once; logic never touches module tags.</li>
+      <li><b>R02</b>: SCP scaling, NE 43 fault (&lt;3.6 / &gt;21 mA), float disagreement latch, setpoint validation.</li>
+      <li><b>R03</b>: lead/lag with seal-ins, 3 s lag stagger, OSF alternation, fail-over by availability, float backup.</li>
+      <li><b>R10/R11</b>: fail to start (5 s), overload, uncommanded run, reset with handshake, start counter.</li>
+      <li><b>R20</b>: alarm template, ack handshake, beacon. <b>Totals</b>: run hours in a 1000 ms periodic task.</li></ul></div>
+    <div><h3>Checked three ways</h3><ul>
+      <li><b>Round trip</b>: the L5X is read back and every rung must match. The open-source <code>l5x</code> library also reads it: 58 tags, UDT members, timer presets.</li>
+      <li><b>Linter</b>: duplicate OTE, one-rung toggles, shared one-shots and timers, HMI bits without handshake, unbalanced latches, self-resetting timers. Clean program: <b data-k="lint"></b> findings.</li>
+      <li><b>Scenario tests</b>: <b data-k="nsc"></b> situations, including both pumps, bad instruments, every alarm, operator errors, comms loss and power-up.</li></ul></div>
+  </div>
+  <div class="box" style="margin-top:3.5mm"><h3>Engineering conventions in the program</h3><div class="two" style="gap:6mm"><ul>
+      <li>One OTE per bit. Latches only for faults, each with a reset path and a test.</li>
+      <li>UDT per device, so one-shots and timers can't be shared by copy-paste (bug B-4 on page 2).</li>
+      <li>I/O mapped in one routine each way, so a card change is a two-rung edit.</li></ul><ul>
+      <li>The HMI only sets requests. The PLC clears them, and clears all of them on first scan, so stale requests don't act at power-up.</li>
+      <li>Setpoints are validated, then used through SPV_ copies. Totals run in a periodic task.</li>
+      <li>Rung comments explain intent and edge cases. Every behaviour has a scenario test.</li></ul></div></div>
+  <div class="foot"><span>Simulation results, not site measurements: plant model and scan engine described on page 2.</span><span>1 / 2</span></div>
+</section>
+
+<section class="pg" style="padding-top:9mm">
+  <div class="two" style="grid-template-columns:1.05fr 1fr">
+    <div><h3>Mutation testing: every one-instruction edit, tested</h3><div class="legend"><span><i style="background:#9AA4AE"></i>5 site checks</span><span><i style="background:#3FB97A"></i>all scenarios</span></div><div id="c-ops"></div><div class="cap" id="r1cap"></div></div>
+    <div><h3>Fail-to-start on P1, then automatic fail-over</h3><div id="c-fail"></div>
+      <h3 style="margin-top:3mm">Selected scenario measurements</h3><table id="sel"></table></div>
+  </div>
+  <h2>Troubleshooting: six classic site edits, seeded one at a time</h2>
+  <table id="bugs"></table>
+  <div class="two" style="margin-top:3mm">
+    <div><h3>Run hours lost by a self-resetting 1 s timer</h3><div id="c-drift"></div></div>
+    <div class="box"><h3>HMI side (FactoryTalk View)</h3><ul>
+      <li><b>hmi_tags.csv</b>: every display item as a direct reference, such as <code>{[PLC]P1.Fault}</code>, with read/write access and handshake notes.</li>
+      <li><b>alarms.csv</b>: alarm triggers on <code>.Active</code>, messages, and the acknowledge tag.</li>
+      <li>Buttons write 1 only and the PLC clears them. Maintained toggles (out of service) are named as such.</li>
+      <li>ISA-101 screen: grey by default, colour only for abnormal states, setpoints shown next to the value in use.</li></ul></div>
+  </div>
+  <h2>How it was measured, and what was not</h2>
+  <div class="mvn">
+    <p><b>Measured.</b> The scan engine compiles the L5X's neutral rung text and runs it at 10 ms scans (17 to 50 ms in some tests), plus a 1000 ms periodic task. It runs against a plant model: wet well 4 m² by 3 m, pumps at 18 / 30 L/s, starters with feedback, floats with differential, 4–20 mA transmitter fault modes. Mutation testing applied every valid one-instruction edit and reran the suites.</p>
+    <p><b>Not measured.</b> A real controller, I/O and HMI runtime. The L5X has not been opened in Logix Designer (no licence in this environment). The engine covers the instructions this program uses and does not model I/O update timing, task pre-emption or fault routines. Plant figures are illustrative. This is a desk test before FAT, not a replacement for it.</p>
+  </div>
+  <div class="foot"><span>Interactive site, L5X, tests and tools: see the review link in the proposal.</span><span>2 / 2</span></div>
+</section>
+<script src="../site/charts.js"></script>
+<script>
+(async () => {
+  const j = async (p) => (await fetch(p)).json();
+  const [SC, MU, TS] = await Promise.all([j("../site/data/scenarios.json"), j("../site/data/mutation.json"), j("../site/data/troubleshooting.json")]);
+  const xml = await (await fetch("../LS01_LiftStation.L5X")).text();
+  const pct = (a, b) => (100 * a / b).toFixed(1) + "%";
+  const m = Object.fromEntries(SC.results.map((r) => [r.id, r.m || {}]));
+  const K = { nsc: SC.results.length, rungs: (xml.match(/<Rung /g) || []).length, pass: `${SC.results.filter((r) => r.pass).length}/${SC.results.length}`, simh: SC.sim_hours.toFixed(1), full: pct(MU.killed_full, MU.valid), basic: pct(MU.killed_basic, MU.valid), valid: MU.valid, fts: `${m.F3.detect_s} s / ${m.F3.takeover_s} s`, lint: TS.clean.lint.length };
+  document.querySelectorAll("[data-k]").forEach((e) => (e.textContent = K[e.dataset.k]));
+  document.getElementById("r1cap").textContent = `${MU.valid} valid one-instruction edits. Round 1 (${MU.round1.scenarios} scenarios) caught ${pct(MU.round1.killed_full, MU.round1.valid)}. The misses showed thin spots in my own tests, which I closed over two more rounds. The ${MU.survivors.length} edits still uncaught were reviewed one by one: equivalent edits, redundant guards and tuning values.`;
+  const M = { l: 36, r: 8, t: 12, b: 30 };
+  barChart(document.getElementById("c-ops"), { rows: Object.entries(MU.by_operator).flatMap(([op, b]) => [{ label: `${op} · site`, v: 100 * b.basic / b.n, color: "#9AA4AE", text: `${b.basic}/${b.n}` }, { label: `${op} · scenarios`, v: 100 * b.full / b.n, color: "#3FB97A", text: `${b.full}/${b.n}` }]), labelW: 112, marginR: 44, rowH: 22, max: 100, ticks: 2, fmt: (v) => v + "%" });
+  const f = m.F3.series, fx = f.map((p) => +(p[0] - m.F3.t0).toFixed(1));
+  lineChart(document.getElementById("c-fail"), { height: 180, margin: { l: 74, r: 8, t: 8, b: 40 }, xDomain: [Math.min(...fx), Math.max(...fx)], yDomain: [0.5, 5.9], yTicks: 6, xTicks: 5, yFmt: (v) => ({ 1: "P2 fbk", 2: "P2 cmd", 3: "P1 fault", 4: "P1 fbk", 5: "P1 cmd" }[v] || ""), xLabel: "s after P1 command",
+    series: [[1, 5, "#3FB97A"], [2, 4, "#3FB97A"], [3, 3, "#E5544B"], [4, 2, "#8E6BD8"], [5, 1, "#8E6BD8"]].map(([k, b, c]) => ({ color: c, x: fx, y: f.map((p) => b + 0.7 * p[k]), width: 2, hover: false })) });
+  const sel = [["F3", "Fail-to-start detection / take-over", `${m.F3.detect_s} s / ${m.F3.takeover_s} s`], ["F6", "Broken transmitter: detected, backup on / off", `${m.F6.detect_s} s, ${m.F6.backup_start_pct} % / ${m.F6.backup_stop_pct} %`], ["F7", "Stuck transmitter: latched after low float; starts in 30 min", `${m.F7.disagree_after_low_float_s} s; ${m.F7.starts_30min}`], ["F14", "Storm day: max level; starts P1 / P2", `${m.F14.max_level_pct} %; ${m.F14.p1_starts} / ${m.F14.p2_starts}`], ["F15", "Run seconds counted over 2 h at a 17 ms scan", `${m.F15.run_s_counted} of 7200`], ["F2", "Lag stagger after lead", `${m.F2.stagger_s} s`]];
+  document.getElementById("sel").innerHTML = sel.map(([id, a, b]) => `<tr><td><code>${id}</code></td><td>${a}</td><td class="n">${b}</td></tr>`).join("");
+  document.getElementById("bugs").innerHTML = `<tr><th></th><th>Edit</th><th>What the operator sees</th><th>Linter</th><th>Failing tests</th></tr>` + TS.bugs.map((b) => `<tr><td><code>${b.id}</code></td><td><b>${b.title}</b></td><td>${b.symptom}</td><td>${b.lint.length ? b.lint.map((x) => `<span class="pill ${x.severity === "error" ? "bad" : "warn"}">${x.rule}</span>`).join("") : '<span class="pill">not static</span>'}</td><td>${b.failing.map((x) => `<span class="pill ${x.basic ? "warn" : "bad"}">${x.id}</span>`).join("")}</td></tr>`).join("");
+  barChart(document.getElementById("c-drift"), { rows: TS.drift.map((d) => ({ label: `${d.scan_ms} ms scan`, v: -d.self_reset_error_pct, color: "#E5544B", text: `−${(-d.self_reset_error_pct).toFixed(1)}% (${d.self_reset} of 3600 s)` })), labelW: 70, marginR: 120, rowH: 22, fmt: (v) => v.toFixed(0) + "%" });
+  await document.fonts.ready; document.body.dataset.ready = "1";
+})();
+</script>
+</body></html>

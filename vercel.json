@@ -1,0 +1,9 @@
+{
+  "framework": null,
+  "buildCommand": "",
+  "outputDirectory": "site",
+  "headers": [
+    { "source": "/(.*)", "headers": [ { "key": "X-Robots-Tag", "value": "noindex, nofollow" } ] },
+    { "source": "/(.*)\\.L5X", "headers": [ { "key": "Content-Type", "value": "application/xml; charset=utf-8" } ] }
+  ]
+}

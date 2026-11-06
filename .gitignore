@@ -1,0 +1,4 @@
+node_modules/
+results_mutation*.log
+.vercel/
+config.bat
