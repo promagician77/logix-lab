@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Ladder Logic Test Bench</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%2314181D'/%3E%3Cpath d='M6 4v24M26 4v24M6 16h6M20 16h6' stroke='%23F2A900' stroke-width='2.4'/%3E%3Cpath d='M12 10v12M20 10v12' stroke='%233FB97A' stroke-width='2.4'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <div class="kick">Studio 5000 Logix Designer · ladder (RLL) · L5X · HMI · tested in simulation</div>
+  <h1>A ladder program you can watch run, break on purpose, and see the tests catch</h1>
+  <p class="lede">LS-01, a duplex lift station: lead/lag with alternation, fail-over, float backup, NE 43 transmitter checks, alarm handling and HMI handshakes. It is <span data-n="rungs">—</span> rungs in an L5X file. Your browser loads that exact file, runs it scan by scan against a simulated wet well and shows it on an ISA-101 style screen with live power flow.</p>
+  <div class="kpis">
+    <div class="kpi"><b class="g" data-n="pass">—</b><span>scenario tests passing (<span data-n="sim-h">—</span> h of plant time in <span data-n="suite-s">—</span> s)</span></div>
+    <div class="kpi"><b class="g"><span data-n="full-pct">—</span>%</b><span>of <span data-n="valid">—</span> one-edit bugs caught by the scenarios</span></div>
+    <div class="kpi"><b class="a"><span data-n="basic-pct">—</span>%</b><span>caught by a typical 5-point site check</span></div>
+    <div class="kpi"><b class="g"><span data-n="ftsd">—</span> s / <span data-n="fto">—</span> s</b><span>fail-to-start detected / other pump running</span></div>
+  </div>
+</div></header>
+
+<nav class="tabs" aria-label="Sections"><div class="wrap" role="tablist">
+  <button data-tab="live"><span class="n">01</span>Live station</button>
+  <button data-tab="tests"><span class="n">02</span>Scenario tests</button>
+  <button data-tab="mutation"><span class="n">03</span>Mutation testing</button>
+  <button data-tab="trouble"><span class="n">04</span>Troubleshooting</button>
+  <button data-tab="program"><span class="n">05</span>Program &amp; standards</button>
+  <button data-tab="run"><span class="n">06</span>Run it</button>
+</div></nav>
+
+<main class="wrap">
+<section class="tab" id="s-live">
+  <div class="bench">
+    <div class="bgrp"><span class="bl">Simulation</span><button id="pause">Pause</button><button data-speed="1" aria-pressed="false">1×</button><button data-speed="10" aria-pressed="true">10×</button><button data-speed="60" aria-pressed="false">60×</button><button id="reset">Reset</button><span class="clk">t = <b id="simclock">00:00:00</b> · scans <b id="scans">0</b></span></div>
+    <div class="bgrp"><span class="bl">Inflow</span><input id="inflow" type="range" min="0" max="35" step="1" value="8" aria-label="Inflow L/s"><b id="inflowv">8 L/s</b></div>
+    <div class="bgrp"><span class="bl">Field: P-101</span><span class="seg" data-hoa="0"><button data-v="HAND">Hand</button><button data-v="OFF">Off</button><button data-v="AUTO" aria-pressed="true">Auto</button></span><button data-fault="olTrip:0">Overload trip</button><button data-fault="failToStart:0">Fail to start</button><button data-fault="welded:0">Welded contactor</button></div>
+    <div class="bgrp"><span class="bl">Field: P-102</span><span class="seg" data-hoa="1"><button data-v="HAND">Hand</button><button data-v="OFF">Off</button><button data-v="AUTO" aria-pressed="true">Auto</button></span><button data-fault="olTrip:1">Overload trip</button><button data-fault="failToStart:1">Fail to start</button></div>
+    <div class="bgrp"><span class="bl">Field: LT-101</span><button data-fault="lt:broken">Broken wire (0 mA)</button><button data-fault="lt:stuck">Stuck at current value</button></div>
+  </div>
+  <div class="live">
+    <div class="hmi-panel">
+      <div id="hmi"></div>
+      <div class="hmi-ctl">
+        <div><span class="hl">P-101</span><button data-cmd="P1.HMI_Reset">Reset</button><button data-cmd="P1.HMI_OOS" aria-pressed="false">Out of service</button></div>
+        <div><span class="hl">P-102</span><button data-cmd="P2.HMI_Reset">Reset</button><button data-cmd="P2.HMI_OOS" aria-pressed="false">Out of service</button></div>
+        <div><span class="hl">LT-101</span><button data-cmd="HMI_LTReset">Reset disagreement</button><button class="ack" data-cmd="HMI_AckAll">Acknowledge all</button></div>
+        <div class="sps"><span class="hl">Setpoints %</span>
+          <label>Lead on<input data-sp="SP_LeadOn" type="number" step="1" value="55"></label><label>Lag on<input data-sp="SP_LagOn" type="number" step="1" value="75"></label>
+          <label>All off<input data-sp="SP_AllOff" type="number" step="1" value="25"></label><label>High alarm<input data-sp="SP_HighAlm" type="number" step="1" value="85"></label></div>
+      </div>
+      <table class="alarms" id="alarms"><thead><tr><th>Time</th><th>Alarm</th><th>State</th></tr></thead><tbody></tbody></table>
+    </div>
+    <div class="lad-panel">
+      <div class="lad-head"><div><b id="rtitle"></b><span id="rdesc"></span></div><div id="routines"></div></div>
+      <div id="xref" hidden></div>
+      <div id="ladder"></div>
+      <p class="lnote">Online view: green rails are power flow, green instructions are true, as in Logix Designer. Click a tag for its cross-reference.</p>
+    </div>
+  </div>
+</section>
+
+<section class="tab" id="s-tests">
+  <h2><span data-n="nsc">—</span> scenario tests, run against the L5X file</h2>
+  <p class="sub">Each test drives the simulated wet well, pumps and transmitter through a situation the station will meet, and checks what the PLC does. The five marked "site check" are what a typical commissioning sheet covers: start, stop, lag, overload, reset. The rest cover fail-over in both directions, bad instruments, every alarm, setpoint boundaries, operator mistakes, comms loss and power-up.</p>
+  <div class="g2">
+    <div class="card"><h3>Storm day: 6 h, diurnal inflow plus a 2 h storm</h3><div class="legend"><span><i style="background:#7FB3E0"></i>level</span><span><i style="background:#F2A900"></i>inflow ×2 (L/s)</span><span><i style="background:#3FB97A;height:5px"></i>P1 running</span><span><i style="background:#B48EF0;height:5px"></i>P2 running</span></div><div id="ch-storm"></div></div>
+    <div class="card"><h3>Fail-to-start on P1: detection and fail-over</h3><div id="ch-fail"></div><p class="note">P1 is commanded and never proves running. At <span data-n="ftsd">—</span> s the fault latches, P1 drops out of the lead assignment and P2 is proving running <span data-n="fto">—</span> s later. No operator action.</p></div>
+  </div>
+  <div class="card" style="margin-top:16px"><table class="t" id="sctb"><thead><tr><th>ID</th><th>Scenario</th><th>Measured</th><th class="n">Run time</th><th>Result</th></tr></thead><tbody></tbody></table></div>
+</section>
+
+<section class="tab" id="s-mutation">
+  <h2>Mutation testing: do the tests notice a bad edit?</h2>
+  <p class="sub">Every possible one-instruction edit was made to the program, one at a time, and the tests were run against each edited copy. The edits: XIC swapped for XIO, a comparison boundary moved, a contact deleted, a branch leg removed, OTE swapped for OTL, a constant or timer preset doubled, a rung deleted. Edits the engine's verify step rejects (wrong operand type, broken rung) were discarded. A test set "catches" an edit if any test fails.</p>
+  <div class="tiles" id="mu-tiles"></div>
+  <p class="sub" id="mu-round"></p>
+  <div class="g2">
+    <div class="card"><h3>Caught, by kind of edit</h3><div class="legend"><span><i style="background:#8B949E"></i>5 site checks</span><span><i style="background:#3FB97A"></i>all scenarios</span></div><div id="ch-ops"></div><p class="note">Full run: <span data-n="mu-time">—</span> s on 2 CPU cores.</p></div>
+    <div class="card"><h3>Missed by the site checks, caught by a scenario (12 examples across routines)</h3><table class="t" id="mu-miss"><thead><tr><th>Where</th><th>Edit</th><th>Rung before / after</th><th>Caught by</th></tr></thead><tbody></tbody></table></div>
+  </div>
+  <div class="card" style="margin-top:16px"><h3>Survivors: edits no test caught, reviewed one by one</h3><table class="t" id="mu-surv"><thead><tr><th>Where</th><th>Edit</th><th>Rung before / after</th><th>Review</th></tr></thead><tbody></tbody></table></div>
+</section>
+
+<section class="tab" id="s-trouble">
+  <h2>Troubleshooting: six classic site edits, seeded on purpose</h2>
+  <p class="sub">Each bug below was put into the working program on its own, then checked two ways. First, a linter reads the L5X like a reviewer would. Second, the scenario tests run the program. The linter finds structural mistakes in seconds without running anything. Behaviour bugs need the tests. The clean program has <span data-n="lint-clean">—</span> lint findings.</p>
+  <div class="bugs" id="bugs"></div>
+  <div class="card" style="margin-top:16px"><h3>Run hours lost by a self-resetting 1 s timer (B-5), by scan time</h3><div id="ch-drift"></div><p class="note">Measured over 1 h of running in the scan model: the reset scans lose time on every 1 s cycle, so the error grows with scan time. The shipped program counts in a 1000 ms periodic task and was exact to the second at every scan time tested (scenario F15).</p></div>
+</section>
+
+<section class="tab" id="s-program">
+  <h2>Program structure and standards</h2>
+  <div class="g2">
+    <div class="card"><h3>Tasks, programs, routines</h3><p class="note">MainTask (continuous) → MainProgram → R00_Main calls each routine in a fixed order. T1000ms (periodic, 1000 ms) → Totals.</p><table class="t" id="rtb"><thead><tr><th>Program</th><th>Routine</th><th>Purpose</th><th class="n">Rungs</th></tr></thead><tbody></tbody></table></div>
+    <div class="card"><h3>Conventions used</h3><ul class="std">
+      <li><b>I/O mapped once</b> (R01 / R30). Logic never touches module tags, so a card move is a two-rung edit.</li>
+      <li><b>UDTs per device</b> (UDT_Pump, UDT_Alarm): one-shots, timers and status live inside the instance, so copying pump 1's logic for pump 2 cannot share a storage bit.</li>
+      <li><b>One OTE per bit.</b> Latches only for faults, each with a reset condition.</li>
+      <li><b>HMI handshake:</b> the HMI sets request bits; the PLC acts and clears them, and clears all of them on first scan. Maintained HMI bits are marked "(maintained)" in the description.</li>
+      <li><b>Setpoints validated</b> before use; the logic only reads the SPV_ copies.</li>
+      <li><b>Alarms:</b> condition → on-delay → active → unacknowledged, from one template.</li>
+      <li><b>Totals in a periodic task</b>, not self-resetting timers.</li>
+      <li><b>Every behaviour has a test</b>, and the tests run against the L5X itself.</li></ul></div>
+  </div>
+  <div class="g2" id="udts" style="margin-top:16px"></div>
+  <div class="card" style="margin-top:16px"><h3>Controller tags</h3><input id="tagq" placeholder="Filter tags…" aria-label="Filter tags"><table class="t" id="tagtb"><thead><tr><th>Tag</th><th>Type</th><th>Description</th></tr></thead><tbody></tbody></table></div>
+</section>
+
+<section class="tab" id="s-run">
+  <h2>Run it</h2>
+  <div class="g2">
+    <div class="card"><h3>Tests and tools (Node 20+)</h3><pre>npm install
+node tools/build_l5x.js        <span class="c"># project → LS01_LiftStation.L5X (+ round-trip check)</span>
+node --test test/liftstation.test.js  <span class="c"># every scenario, against the L5X</span>
+node tools/lint.js LS01_LiftStation.L5X
+node tools/mutate.js           <span class="c"># one-edit mutants, site checks vs scenarios</span>
+node tools/seeded.js           <span class="c"># troubleshooting study</span></pre>
+      <p class="note">Download the program: <a href="LS01_LiftStation.L5X" download>LS01_LiftStation.L5X</a>. HMI reference lists: <a href="hmi/alarms.csv" download>alarms.csv</a>, <a href="hmi/hmi_tags.csv" download>hmi_tags.csv</a>.</p></div>
+    <div class="card"><h3>Into Logix Designer</h3><ul class="std">
+      <li><b>L5X:</b> Logix Designer opens .L5X files with File › Open and builds a project from them. This file targets a CompactLogix 1769-L33ER at v32. Once open, add the I/O modules and point R01 and R30 at the module tags.</li>
+      <li><b>Single rungs:</b> every rung's text above is Rockwell neutral text, so you can paste it into the rung editor's ASCII view.</li>
+      <li><b>HMI:</b> the screen here shows the design. In FactoryTalk View ME/SE it maps one-to-one to direct references such as <code>{[PLC]P1.Fault}</code> (see hmi_tags.csv).</li>
+      <li><b>Independent read:</b> the open-source <code>l5x</code> Python library opens the file and reads all 58 tags, both programs, the UDT BOOL members, timer presets and descriptions (<code>tools/check_l5x.py</code>).</li>
+      <li><b>Honest scope:</b> the L5X has not been opened in Logix Designer here, because there is no Rockwell licence in this environment. The scan engine implements the instructions this program uses, following Rockwell's instruction reference. It is a test bench, not a controller emulator: no I/O update timing, no task overlap, no fault routines.</li></ul></div>
+  </div>
+</section>
+</main>
+<footer><div class="wrap g2">
+  <div><h3>Measured</h3><p>All 25 scenario results, the mutation study, the lint findings and the run-hour drift were produced by running the shipped L5X in the scan engine against the plant model. The figures on this page are loaded from those result files.</p></div>
+  <div><h3>Not measured</h3><p>A real controller, real I/O, a real HMI runtime, network behaviour and real pump hydraulics. Plant numbers (wet well 4 m², pumps 18 / 30 L/s) are illustrative. The scan engine is a test tool and does not replace Logix Designer's Verify or an on-site FAT.</p></div>
+</div></footer>
+<script src="charts.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>

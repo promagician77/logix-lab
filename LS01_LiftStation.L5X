@@ -1,0 +1,1602 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<RSLogix5000Content SchemaRevision="1.0" SoftwareRevision="32.11" TargetName="LS01_LiftStation" TargetType="Controller" ContainsContext="false" ExportDate="Fri Nov 06 17:00:00 2026" ExportOptions="NoRawData DecoratedData ForceProtectedEncoding AllProjDocTrans">
+<Controller Use="Target" Name="LS01_LiftStation" ProcessorType="1769-L33ER" MajorRev="32" MinorRev="11" MatchProjectToController="false" CanUseRPIFromProducer="false" InhibitAutomaticFirmwareUpdate="0">
+<Description>
+<![CDATA[LS-01 duplex lift station: lead/lag with alternation, fail-over, float backup, alarms]]>
+</Description>
+<DataTypes>
+<DataType Name="UDT_Pump" Family="NoFamily" Class="User">
+<Description>
+<![CDATA[Constant-speed pump with HOA, starter feedback and overload]]>
+</Description>
+<Members>
+<Member Name="ZZZZZZZZZZUDT_Pump0" DataType="SINT" Dimension="0" Radix="Decimal" Hidden="true" ExternalAccess="Read/Write"/>
+<Member Name="HOA_Auto" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Pump0" BitNumber="0" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Selector in AUTO (from field)]]>
+</Description>
+</Member>
+<Member Name="HOA_Hand" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Pump0" BitNumber="1" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Selector in HAND (hardwired run, PLC monitors only)]]>
+</Description>
+</Member>
+<Member Name="RunFbk" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Pump0" BitNumber="2" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Motor contactor auxiliary: running]]>
+</Description>
+</Member>
+<Member Name="OL_Trip" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Pump0" BitNumber="3" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Overload relay tripped (field contact is NC)]]>
+</Description>
+</Member>
+<Member Name="Call" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Pump0" BitNumber="4" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Auto demand from lead/lag]]>
+</Description>
+</Member>
+<Member Name="Avail" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Pump0" BitNumber="5" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Available: AUTO, healthy, in service]]>
+</Description>
+</Member>
+<Member Name="Cmd_Run" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Pump0" BitNumber="6" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Run command to starter]]>
+</Description>
+</Member>
+<Member Name="Flt_FTS" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Pump0" BitNumber="7" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Fault: failed to start (latched)]]>
+</Description>
+</Member>
+<Member Name="ZZZZZZZZZZUDT_Pump1" DataType="SINT" Dimension="0" Radix="Decimal" Hidden="true" ExternalAccess="Read/Write"/>
+<Member Name="Flt_OL" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Pump1" BitNumber="0" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Fault: overload trip (latched)]]>
+</Description>
+</Member>
+<Member Name="Flt_Uncmd" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Pump1" BitNumber="1" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Running without command in AUTO]]>
+</Description>
+</Member>
+<Member Name="Fault" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Pump1" BitNumber="2" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Any latched fault]]>
+</Description>
+</Member>
+<Member Name="HMI_Reset" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Pump1" BitNumber="3" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[HMI fault reset request (PLC clears)]]>
+</Description>
+</Member>
+<Member Name="HMI_OOS" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Pump1" BitNumber="4" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[HMI out-of-service (maintained)]]>
+</Description>
+</Member>
+<Member Name="Start_ONS" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Pump1" BitNumber="5" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[One-shot storage: start counter]]>
+</Description>
+</Member>
+<Member Name="FTS_Tmr" DataType="TIMER" Dimension="0" Radix="NullType" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Fail-to-start delay]]>
+</Description>
+</Member>
+<Member Name="Uncmd_Tmr" DataType="TIMER" Dimension="0" Radix="NullType" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Uncommanded-run delay]]>
+</Description>
+</Member>
+<Member Name="Starts" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Start count]]>
+</Description>
+</Member>
+<Member Name="RunSec" DataType="DINT" Dimension="0" Radix="Decimal" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Run time, seconds (1 s periodic task)]]>
+</Description>
+</Member>
+<Member Name="RunHrs" DataType="REAL" Dimension="0" Radix="Float" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Run time, hours]]>
+</Description>
+</Member>
+</Members>
+</DataType>
+<DataType Name="UDT_Alarm" Family="NoFamily" Class="User">
+<Description>
+<![CDATA[Alarm with on-delay, active and unacknowledged state]]>
+</Description>
+<Members>
+<Member Name="ZZZZZZZZZZUDT_Alarm0" DataType="SINT" Dimension="0" Radix="Decimal" Hidden="true" ExternalAccess="Read/Write"/>
+<Member Name="Cond" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Alarm0" BitNumber="0" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Alarm condition (raw)]]>
+</Description>
+</Member>
+<Member Name="Dly" DataType="TIMER" Dimension="0" Radix="NullType" Hidden="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[On-delay before the alarm becomes active]]>
+</Description>
+</Member>
+<Member Name="ZZZZZZZZZZUDT_Alarm1" DataType="SINT" Dimension="0" Radix="Decimal" Hidden="true" ExternalAccess="Read/Write"/>
+<Member Name="Active" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Alarm1" BitNumber="0" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Alarm active]]>
+</Description>
+</Member>
+<Member Name="Unack" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Alarm1" BitNumber="1" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Active since last acknowledge]]>
+</Description>
+</Member>
+<Member Name="Edge_ONS" DataType="BIT" Dimension="0" Radix="Decimal" Hidden="false" Target="ZZZZZZZZZZUDT_Alarm1" BitNumber="2" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[One-shot storage: new alarm edge]]>
+</Description>
+</Member>
+</Members>
+</DataType>
+</DataTypes>
+<Tags>
+<Tag Name="DI_P1_Auto" TagType="Base" DataType="BOOL" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[I/O: pump 1 HOA in AUTO]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="BOOL" Value="0"/>
+</Data>
+</Tag>
+<Tag Name="DI_P1_Hand" TagType="Base" DataType="BOOL" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[I/O: pump 1 HOA in HAND]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="BOOL" Value="0"/>
+</Data>
+</Tag>
+<Tag Name="DI_P1_RunFbk" TagType="Base" DataType="BOOL" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[I/O: pump 1 contactor aux]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="BOOL" Value="0"/>
+</Data>
+</Tag>
+<Tag Name="DI_P1_OL_OK" TagType="Base" DataType="BOOL" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[I/O: pump 1 overload healthy (NC)]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="BOOL" Value="1"/>
+</Data>
+</Tag>
+<Tag Name="DO_P1_Run" TagType="Base" DataType="BOOL" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[I/O: pump 1 run output]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="BOOL" Value="0"/>
+</Data>
+</Tag>
+<Tag Name="DI_P2_Auto" TagType="Base" DataType="BOOL" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[I/O: pump 2 HOA in AUTO]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="BOOL" Value="0"/>
+</Data>
+</Tag>
+<Tag Name="DI_P2_Hand" TagType="Base" DataType="BOOL" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[I/O: pump 2 HOA in HAND]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="BOOL" Value="0"/>
+</Data>
+</Tag>
+<Tag Name="DI_P2_RunFbk" TagType="Base" DataType="BOOL" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[I/O: pump 2 contactor aux]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="BOOL" Value="0"/>
+</Data>
+</Tag>
+<Tag Name="DI_P2_OL_OK" TagType="Base" DataType="BOOL" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[I/O: pump 2 overload healthy (NC)]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="BOOL" Value="1"/>
+</Data>
+</Tag>
+<Tag Name="DO_P2_Run" TagType="Base" DataType="BOOL" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[I/O: pump 2 run output]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="BOOL" Value="0"/>
+</Data>
+</Tag>
+<Tag Name="DI_LSHH" TagType="Base" DataType="BOOL" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[I/O: high-high float, 1 = normal (fail-safe)]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="BOOL" Value="1"/>
+</Data>
+</Tag>
+<Tag Name="DI_LSL" TagType="Base" DataType="BOOL" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[I/O: low float, 1 = not low (fail-safe)]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="BOOL" Value="1"/>
+</Data>
+</Tag>
+<Tag Name="AI_LT101_mA" TagType="Base" DataType="REAL" Radix="Float" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[I/O: LT-101 level transmitter, mA]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="4.0"/>
+</Data>
+</Tag>
+<Tag Name="DO_Beacon" TagType="Base" DataType="BOOL" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[I/O: alarm beacon]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="BOOL" Value="0"/>
+</Data>
+</Tag>
+<Tag Name="LT101_Pct" TagType="Base" DataType="REAL" Radix="Float" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Wet well level, % of span]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</Data>
+</Tag>
+<Tag Name="LT101_Fault" TagType="Base" DataType="BOOL" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[LT-101 signal outside 3.6 to 21 mA (NE 43)]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="BOOL" Value="0"/>
+</Data>
+</Tag>
+<Tag Name="LT_Disagree" TagType="Base" DataType="BOOL" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[LT-101 disagrees with a float (latched)]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="BOOL" Value="0"/>
+</Data>
+</Tag>
+<Tag Name="LT_DisLoLim" TagType="Base" DataType="REAL" Radix="Float" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Disagree limit vs low float]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</Data>
+</Tag>
+<Tag Name="LT_DisHiLim" TagType="Base" DataType="REAL" Radix="Float" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Disagree limit vs high-high float]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</Data>
+</Tag>
+<Tag Name="LT101_Bad" TagType="Base" DataType="BOOL" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Level transmitter not usable: float backup mode]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="BOOL" Value="0"/>
+</Data>
+</Tag>
+<Tag Name="HMI_LTReset" TagType="Base" DataType="BOOL" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[HMI: reset LT disagreement (PLC clears)]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="BOOL" Value="0"/>
+</Data>
+</Tag>
+<Tag Name="SP_LeadOn" TagType="Base" DataType="REAL" Radix="Float" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[HMI setpoint: lead pump on, %]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="55.0"/>
+</Data>
+</Tag>
+<Tag Name="SP_LagOn" TagType="Base" DataType="REAL" Radix="Float" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[HMI setpoint: lag pump on, %]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="75.0"/>
+</Data>
+</Tag>
+<Tag Name="SP_AllOff" TagType="Base" DataType="REAL" Radix="Float" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[HMI setpoint: pumps off, %]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="25.0"/>
+</Data>
+</Tag>
+<Tag Name="SP_HighAlm" TagType="Base" DataType="REAL" Radix="Float" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[HMI setpoint: high level alarm, %]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="85.0"/>
+</Data>
+</Tag>
+<Tag Name="SPV_LeadOn" TagType="Base" DataType="REAL" Radix="Float" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Validated setpoint used by control]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="55.0"/>
+</Data>
+</Tag>
+<Tag Name="SPV_LagOn" TagType="Base" DataType="REAL" Radix="Float" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Validated setpoint used by control]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="75.0"/>
+</Data>
+</Tag>
+<Tag Name="SPV_AllOff" TagType="Base" DataType="REAL" Radix="Float" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Validated setpoint used by control]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="25.0"/>
+</Data>
+</Tag>
+<Tag Name="SPV_HighAlm" TagType="Base" DataType="REAL" Radix="Float" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Validated setpoint used by control]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="85.0"/>
+</Data>
+</Tag>
+<Tag Name="SP_Chk1" TagType="Base" DataType="REAL" Radix="Float" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Setpoint check: AllOff + 5]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</Data>
+</Tag>
+<Tag Name="SP_Chk2" TagType="Base" DataType="REAL" Radix="Float" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Setpoint check: LeadOn + 5]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="REAL" Radix="Float" Value="0.0"/>
+</Data>
+</Tag>
+<Tag Name="SP_Valid" TagType="Base" DataType="BOOL" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[HMI setpoints pass checks]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="BOOL" Value="0"/>
+</Data>
+</Tag>
+<Tag Name="Lead_Dmd" TagType="Base" DataType="BOOL" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Level demand for lead pump (transmitter)]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="BOOL" Value="0"/>
+</Data>
+</Tag>
+<Tag Name="Lag_Dmd" TagType="Base" DataType="BOOL" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Level demand for lag pump (transmitter)]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="BOOL" Value="0"/>
+</Data>
+</Tag>
+<Tag Name="Bkp_Dmd" TagType="Base" DataType="BOOL" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Float backup demand (latched)]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="BOOL" Value="0"/>
+</Data>
+</Tag>
+<Tag Name="Lead_Call" TagType="Base" DataType="BOOL" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Lead pump call]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="BOOL" Value="0"/>
+</Data>
+</Tag>
+<Tag Name="Lag_Call" TagType="Base" DataType="BOOL" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Lag pump call]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="BOOL" Value="0"/>
+</Data>
+</Tag>
+<Tag Name="Alt_OSF_Sto" TagType="Base" DataType="BOOL" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[One-shot storage: end of lead cycle]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="BOOL" Value="0"/>
+</Data>
+</Tag>
+<Tag Name="Alt_Pulse" TagType="Base" DataType="BOOL" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[End of lead cycle pulse]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="BOOL" Value="0"/>
+</Data>
+</Tag>
+<Tag Name="Lead_Idx" TagType="Base" DataType="DINT" Radix="Decimal" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Alternator: 0 = P1 lead, 1 = P2 lead]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="DINT" Radix="Decimal" Value="0"/>
+</Data>
+</Tag>
+<Tag Name="P1_IsLead" TagType="Base" DataType="BOOL" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[P1 is effective lead]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="BOOL" Value="0"/>
+</Data>
+</Tag>
+<Tag Name="P2_IsLead" TagType="Base" DataType="BOOL" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[P2 is effective lead]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="BOOL" Value="0"/>
+</Data>
+</Tag>
+<Tag Name="HMI_AckAll" TagType="Base" DataType="BOOL" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[HMI: acknowledge all alarms (PLC clears)]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="BOOL" Value="0"/>
+</Data>
+</Tag>
+<Tag Name="ALM_AnyUnack" TagType="Base" DataType="BOOL" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Any unacknowledged alarm]]>
+</Description>
+<Data Format="Decorated">
+<DataValue DataType="BOOL" Value="0"/>
+</Data>
+</Tag>
+<Tag Name="P1" TagType="Base" DataType="UDT_Pump" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Pump P-101]]>
+</Description>
+<Data Format="Decorated">
+<Structure DataType="UDT_Pump">
+<DataValueMember Name="HOA_Auto" DataType="BOOL" Value="0"/>
+<DataValueMember Name="HOA_Hand" DataType="BOOL" Value="0"/>
+<DataValueMember Name="RunFbk" DataType="BOOL" Value="0"/>
+<DataValueMember Name="OL_Trip" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Call" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Avail" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Cmd_Run" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Flt_FTS" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Flt_OL" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Flt_Uncmd" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Fault" DataType="BOOL" Value="0"/>
+<DataValueMember Name="HMI_Reset" DataType="BOOL" Value="0"/>
+<DataValueMember Name="HMI_OOS" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Start_ONS" DataType="BOOL" Value="0"/>
+<StructureMember Name="FTS_Tmr" DataType="TIMER">
+ <DataValueMember Name="PRE" DataType="DINT" Radix="Decimal" Value="5000"/>
+ <DataValueMember Name="ACC" DataType="DINT" Radix="Decimal" Value="0"/>
+ <DataValueMember Name="EN" DataType="BOOL" Value="0"/>
+ <DataValueMember Name="TT" DataType="BOOL" Value="0"/>
+ <DataValueMember Name="DN" DataType="BOOL" Value="0"/>
+</StructureMember>
+<StructureMember Name="Uncmd_Tmr" DataType="TIMER">
+ <DataValueMember Name="PRE" DataType="DINT" Radix="Decimal" Value="3000"/>
+ <DataValueMember Name="ACC" DataType="DINT" Radix="Decimal" Value="0"/>
+ <DataValueMember Name="EN" DataType="BOOL" Value="0"/>
+ <DataValueMember Name="TT" DataType="BOOL" Value="0"/>
+ <DataValueMember Name="DN" DataType="BOOL" Value="0"/>
+</StructureMember>
+<DataValueMember Name="Starts" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="RunSec" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="RunHrs" DataType="REAL" Radix="Float" Value="0.0"/>
+</Structure>
+</Data>
+</Tag>
+<Tag Name="P2" TagType="Base" DataType="UDT_Pump" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Pump P-102]]>
+</Description>
+<Data Format="Decorated">
+<Structure DataType="UDT_Pump">
+<DataValueMember Name="HOA_Auto" DataType="BOOL" Value="0"/>
+<DataValueMember Name="HOA_Hand" DataType="BOOL" Value="0"/>
+<DataValueMember Name="RunFbk" DataType="BOOL" Value="0"/>
+<DataValueMember Name="OL_Trip" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Call" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Avail" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Cmd_Run" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Flt_FTS" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Flt_OL" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Flt_Uncmd" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Fault" DataType="BOOL" Value="0"/>
+<DataValueMember Name="HMI_Reset" DataType="BOOL" Value="0"/>
+<DataValueMember Name="HMI_OOS" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Start_ONS" DataType="BOOL" Value="0"/>
+<StructureMember Name="FTS_Tmr" DataType="TIMER">
+ <DataValueMember Name="PRE" DataType="DINT" Radix="Decimal" Value="5000"/>
+ <DataValueMember Name="ACC" DataType="DINT" Radix="Decimal" Value="0"/>
+ <DataValueMember Name="EN" DataType="BOOL" Value="0"/>
+ <DataValueMember Name="TT" DataType="BOOL" Value="0"/>
+ <DataValueMember Name="DN" DataType="BOOL" Value="0"/>
+</StructureMember>
+<StructureMember Name="Uncmd_Tmr" DataType="TIMER">
+ <DataValueMember Name="PRE" DataType="DINT" Radix="Decimal" Value="3000"/>
+ <DataValueMember Name="ACC" DataType="DINT" Radix="Decimal" Value="0"/>
+ <DataValueMember Name="EN" DataType="BOOL" Value="0"/>
+ <DataValueMember Name="TT" DataType="BOOL" Value="0"/>
+ <DataValueMember Name="DN" DataType="BOOL" Value="0"/>
+</StructureMember>
+<DataValueMember Name="Starts" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="RunSec" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="RunHrs" DataType="REAL" Radix="Float" Value="0.0"/>
+</Structure>
+</Data>
+</Tag>
+<Tag Name="LT101_FltTmr" TagType="Base" DataType="TIMER" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[LT-101 signal fault filter]]>
+</Description>
+<Data Format="Decorated">
+<Structure DataType="TIMER">
+<DataValueMember Name="PRE" DataType="DINT" Radix="Decimal" Value="2000"/>
+<DataValueMember Name="ACC" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="EN" DataType="BOOL" Value="0"/>
+<DataValueMember Name="TT" DataType="BOOL" Value="0"/>
+<DataValueMember Name="DN" DataType="BOOL" Value="0"/>
+</Structure>
+</Data>
+</Tag>
+<Tag Name="LT_Dis_Tmr" TagType="Base" DataType="TIMER" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[LT-101 vs float disagreement filter]]>
+</Description>
+<Data Format="Decorated">
+<Structure DataType="TIMER">
+<DataValueMember Name="PRE" DataType="DINT" Radix="Decimal" Value="5000"/>
+<DataValueMember Name="ACC" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="EN" DataType="BOOL" Value="0"/>
+<DataValueMember Name="TT" DataType="BOOL" Value="0"/>
+<DataValueMember Name="DN" DataType="BOOL" Value="0"/>
+</Structure>
+</Data>
+</Tag>
+<Tag Name="Lag_Stagger" TagType="Base" DataType="TIMER" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Lag start stagger after lead]]>
+</Description>
+<Data Format="Decorated">
+<Structure DataType="TIMER">
+<DataValueMember Name="PRE" DataType="DINT" Radix="Decimal" Value="3000"/>
+<DataValueMember Name="ACC" DataType="DINT" Radix="Decimal" Value="0"/>
+<DataValueMember Name="EN" DataType="BOOL" Value="0"/>
+<DataValueMember Name="TT" DataType="BOOL" Value="0"/>
+<DataValueMember Name="DN" DataType="BOOL" Value="0"/>
+</Structure>
+</Data>
+</Tag>
+<Tag Name="ALM_HighLevel" TagType="Base" DataType="UDT_Alarm" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Wet well high level]]>
+</Description>
+<Data Format="Decorated">
+<Structure DataType="UDT_Alarm">
+<DataValueMember Name="Cond" DataType="BOOL" Value="0"/>
+<StructureMember Name="Dly" DataType="TIMER">
+ <DataValueMember Name="PRE" DataType="DINT" Radix="Decimal" Value="5000"/>
+ <DataValueMember Name="ACC" DataType="DINT" Radix="Decimal" Value="0"/>
+ <DataValueMember Name="EN" DataType="BOOL" Value="0"/>
+ <DataValueMember Name="TT" DataType="BOOL" Value="0"/>
+ <DataValueMember Name="DN" DataType="BOOL" Value="0"/>
+</StructureMember>
+<DataValueMember Name="Active" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Unack" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Edge_ONS" DataType="BOOL" Value="0"/>
+</Structure>
+</Data>
+</Tag>
+<Tag Name="ALM_HiHiFloat" TagType="Base" DataType="UDT_Alarm" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[High-high float]]>
+</Description>
+<Data Format="Decorated">
+<Structure DataType="UDT_Alarm">
+<DataValueMember Name="Cond" DataType="BOOL" Value="0"/>
+<StructureMember Name="Dly" DataType="TIMER">
+ <DataValueMember Name="PRE" DataType="DINT" Radix="Decimal" Value="1000"/>
+ <DataValueMember Name="ACC" DataType="DINT" Radix="Decimal" Value="0"/>
+ <DataValueMember Name="EN" DataType="BOOL" Value="0"/>
+ <DataValueMember Name="TT" DataType="BOOL" Value="0"/>
+ <DataValueMember Name="DN" DataType="BOOL" Value="0"/>
+</StructureMember>
+<DataValueMember Name="Active" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Unack" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Edge_ONS" DataType="BOOL" Value="0"/>
+</Structure>
+</Data>
+</Tag>
+<Tag Name="ALM_LT101" TagType="Base" DataType="UDT_Alarm" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Level transmitter LT-101 failed or disagrees with floats]]>
+</Description>
+<Data Format="Decorated">
+<Structure DataType="UDT_Alarm">
+<DataValueMember Name="Cond" DataType="BOOL" Value="0"/>
+<StructureMember Name="Dly" DataType="TIMER">
+ <DataValueMember Name="PRE" DataType="DINT" Radix="Decimal" Value="0"/>
+ <DataValueMember Name="ACC" DataType="DINT" Radix="Decimal" Value="0"/>
+ <DataValueMember Name="EN" DataType="BOOL" Value="0"/>
+ <DataValueMember Name="TT" DataType="BOOL" Value="0"/>
+ <DataValueMember Name="DN" DataType="BOOL" Value="0"/>
+</StructureMember>
+<DataValueMember Name="Active" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Unack" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Edge_ONS" DataType="BOOL" Value="0"/>
+</Structure>
+</Data>
+</Tag>
+<Tag Name="ALM_P1_Fault" TagType="Base" DataType="UDT_Alarm" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Pump 1 fault]]>
+</Description>
+<Data Format="Decorated">
+<Structure DataType="UDT_Alarm">
+<DataValueMember Name="Cond" DataType="BOOL" Value="0"/>
+<StructureMember Name="Dly" DataType="TIMER">
+ <DataValueMember Name="PRE" DataType="DINT" Radix="Decimal" Value="0"/>
+ <DataValueMember Name="ACC" DataType="DINT" Radix="Decimal" Value="0"/>
+ <DataValueMember Name="EN" DataType="BOOL" Value="0"/>
+ <DataValueMember Name="TT" DataType="BOOL" Value="0"/>
+ <DataValueMember Name="DN" DataType="BOOL" Value="0"/>
+</StructureMember>
+<DataValueMember Name="Active" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Unack" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Edge_ONS" DataType="BOOL" Value="0"/>
+</Structure>
+</Data>
+</Tag>
+<Tag Name="ALM_P2_Fault" TagType="Base" DataType="UDT_Alarm" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Pump 2 fault]]>
+</Description>
+<Data Format="Decorated">
+<Structure DataType="UDT_Alarm">
+<DataValueMember Name="Cond" DataType="BOOL" Value="0"/>
+<StructureMember Name="Dly" DataType="TIMER">
+ <DataValueMember Name="PRE" DataType="DINT" Radix="Decimal" Value="0"/>
+ <DataValueMember Name="ACC" DataType="DINT" Radix="Decimal" Value="0"/>
+ <DataValueMember Name="EN" DataType="BOOL" Value="0"/>
+ <DataValueMember Name="TT" DataType="BOOL" Value="0"/>
+ <DataValueMember Name="DN" DataType="BOOL" Value="0"/>
+</StructureMember>
+<DataValueMember Name="Active" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Unack" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Edge_ONS" DataType="BOOL" Value="0"/>
+</Structure>
+</Data>
+</Tag>
+<Tag Name="ALM_P1_Uncmd" TagType="Base" DataType="UDT_Alarm" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Pump 1 running without command]]>
+</Description>
+<Data Format="Decorated">
+<Structure DataType="UDT_Alarm">
+<DataValueMember Name="Cond" DataType="BOOL" Value="0"/>
+<StructureMember Name="Dly" DataType="TIMER">
+ <DataValueMember Name="PRE" DataType="DINT" Radix="Decimal" Value="0"/>
+ <DataValueMember Name="ACC" DataType="DINT" Radix="Decimal" Value="0"/>
+ <DataValueMember Name="EN" DataType="BOOL" Value="0"/>
+ <DataValueMember Name="TT" DataType="BOOL" Value="0"/>
+ <DataValueMember Name="DN" DataType="BOOL" Value="0"/>
+</StructureMember>
+<DataValueMember Name="Active" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Unack" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Edge_ONS" DataType="BOOL" Value="0"/>
+</Structure>
+</Data>
+</Tag>
+<Tag Name="ALM_P2_Uncmd" TagType="Base" DataType="UDT_Alarm" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Pump 2 running without command]]>
+</Description>
+<Data Format="Decorated">
+<Structure DataType="UDT_Alarm">
+<DataValueMember Name="Cond" DataType="BOOL" Value="0"/>
+<StructureMember Name="Dly" DataType="TIMER">
+ <DataValueMember Name="PRE" DataType="DINT" Radix="Decimal" Value="0"/>
+ <DataValueMember Name="ACC" DataType="DINT" Radix="Decimal" Value="0"/>
+ <DataValueMember Name="EN" DataType="BOOL" Value="0"/>
+ <DataValueMember Name="TT" DataType="BOOL" Value="0"/>
+ <DataValueMember Name="DN" DataType="BOOL" Value="0"/>
+</StructureMember>
+<DataValueMember Name="Active" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Unack" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Edge_ONS" DataType="BOOL" Value="0"/>
+</Structure>
+</Data>
+</Tag>
+<Tag Name="ALM_NoPump" TagType="Base" DataType="UDT_Alarm" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[No pump available]]>
+</Description>
+<Data Format="Decorated">
+<Structure DataType="UDT_Alarm">
+<DataValueMember Name="Cond" DataType="BOOL" Value="0"/>
+<StructureMember Name="Dly" DataType="TIMER">
+ <DataValueMember Name="PRE" DataType="DINT" Radix="Decimal" Value="2000"/>
+ <DataValueMember Name="ACC" DataType="DINT" Radix="Decimal" Value="0"/>
+ <DataValueMember Name="EN" DataType="BOOL" Value="0"/>
+ <DataValueMember Name="TT" DataType="BOOL" Value="0"/>
+ <DataValueMember Name="DN" DataType="BOOL" Value="0"/>
+</StructureMember>
+<DataValueMember Name="Active" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Unack" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Edge_ONS" DataType="BOOL" Value="0"/>
+</Structure>
+</Data>
+</Tag>
+<Tag Name="ALM_SPInvalid" TagType="Base" DataType="UDT_Alarm" Constant="false" ExternalAccess="Read/Write">
+<Description>
+<![CDATA[Level setpoints rejected]]>
+</Description>
+<Data Format="Decorated">
+<Structure DataType="UDT_Alarm">
+<DataValueMember Name="Cond" DataType="BOOL" Value="0"/>
+<StructureMember Name="Dly" DataType="TIMER">
+ <DataValueMember Name="PRE" DataType="DINT" Radix="Decimal" Value="0"/>
+ <DataValueMember Name="ACC" DataType="DINT" Radix="Decimal" Value="0"/>
+ <DataValueMember Name="EN" DataType="BOOL" Value="0"/>
+ <DataValueMember Name="TT" DataType="BOOL" Value="0"/>
+ <DataValueMember Name="DN" DataType="BOOL" Value="0"/>
+</StructureMember>
+<DataValueMember Name="Active" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Unack" DataType="BOOL" Value="0"/>
+<DataValueMember Name="Edge_ONS" DataType="BOOL" Value="0"/>
+</Structure>
+</Data>
+</Tag>
+</Tags>
+<Programs>
+<Program Name="MainProgram" TestEdits="false" MainRoutineName="R00_Main" Disabled="false" UseAsFolder="false">
+<Tags/>
+<Routines>
+<Routine Name="R00_Main" Type="RLL">
+<Description>
+<![CDATA[Scan order]]>
+</Description>
+<RLLContent>
+<Rung Number="0" Type="N">
+<Comment>
+<![CDATA[First scan: clear every HMI request bit so nothing acts on power-up.]]>
+</Comment>
+<Text>
+<![CDATA[XIC(S:FS)[OTU(HMI_AckAll),OTU(HMI_LTReset),OTU(P1.HMI_Reset),OTU(P2.HMI_Reset)];]]>
+</Text>
+</Rung>
+<Rung Number="1" Type="N">
+<Comment>
+<![CDATA[Scan order: inputs, level, lead/lag, pumps, alarms, outputs.]]>
+</Comment>
+<Text>
+<![CDATA[JSR(R01_Inputs,0);]]>
+</Text>
+</Rung>
+<Rung Number="2" Type="N">
+<Text>
+<![CDATA[JSR(R02_Level,0);]]>
+</Text>
+</Rung>
+<Rung Number="3" Type="N">
+<Text>
+<![CDATA[JSR(R03_LeadLag,0);]]>
+</Text>
+</Rung>
+<Rung Number="4" Type="N">
+<Text>
+<![CDATA[JSR(R10_Pump1,0);]]>
+</Text>
+</Rung>
+<Rung Number="5" Type="N">
+<Text>
+<![CDATA[JSR(R11_Pump2,0);]]>
+</Text>
+</Rung>
+<Rung Number="6" Type="N">
+<Text>
+<![CDATA[JSR(R20_Alarms,0);]]>
+</Text>
+</Rung>
+<Rung Number="7" Type="N">
+<Text>
+<![CDATA[JSR(R30_Outputs,0);]]>
+</Text>
+</Rung>
+</RLLContent>
+</Routine>
+<Routine Name="R01_Inputs" Type="RLL">
+<Description>
+<![CDATA[I/O mapping: field inputs to pump structures]]>
+</Description>
+<RLLContent>
+<Rung Number="0" Type="N">
+<Comment>
+<![CDATA[Map field inputs once, here. Replace the DI_ placeholder tags with module tags (Local:x:I.Data.n) at commissioning.]]>
+</Comment>
+<Text>
+<![CDATA[XIC(DI_P1_Auto)OTE(P1.HOA_Auto);]]>
+</Text>
+</Rung>
+<Rung Number="1" Type="N">
+<Text>
+<![CDATA[XIC(DI_P1_Hand)OTE(P1.HOA_Hand);]]>
+</Text>
+</Rung>
+<Rung Number="2" Type="N">
+<Text>
+<![CDATA[XIC(DI_P1_RunFbk)OTE(P1.RunFbk);]]>
+</Text>
+</Rung>
+<Rung Number="3" Type="N">
+<Comment>
+<![CDATA[Overload contact is normally closed: an open contact (or a broken wire) is a trip.]]>
+</Comment>
+<Text>
+<![CDATA[XIO(DI_P1_OL_OK)OTE(P1.OL_Trip);]]>
+</Text>
+</Rung>
+<Rung Number="4" Type="N">
+<Text>
+<![CDATA[XIC(DI_P2_Auto)OTE(P2.HOA_Auto);]]>
+</Text>
+</Rung>
+<Rung Number="5" Type="N">
+<Text>
+<![CDATA[XIC(DI_P2_Hand)OTE(P2.HOA_Hand);]]>
+</Text>
+</Rung>
+<Rung Number="6" Type="N">
+<Text>
+<![CDATA[XIC(DI_P2_RunFbk)OTE(P2.RunFbk);]]>
+</Text>
+</Rung>
+<Rung Number="7" Type="N">
+<Comment>
+<![CDATA[Overload contact is normally closed: an open contact (or a broken wire) is a trip.]]>
+</Comment>
+<Text>
+<![CDATA[XIO(DI_P2_OL_OK)OTE(P2.OL_Trip);]]>
+</Text>
+</Rung>
+</RLLContent>
+</Routine>
+<Routine Name="R02_Level" Type="RLL">
+<Description>
+<![CDATA[Level scaling, transmitter checks, setpoint validation]]>
+</Description>
+<RLLContent>
+<Rung Number="0" Type="N">
+<Comment>
+<![CDATA[Scale LT-101 4-20 mA to 0-100 % of wet well span.]]>
+</Comment>
+<Text>
+<![CDATA[SCP(AI_LT101_mA,4.0,20.0,0.0,100.0,LT101_Pct);]]>
+</Text>
+</Rung>
+<Rung Number="1" Type="N">
+<Comment>
+<![CDATA[Signal fault per NAMUR NE 43: below 3.6 mA (broken wire) or above 21 mA, filtered 2 s.]]>
+</Comment>
+<Text>
+<![CDATA[[LES(AI_LT101_mA,3.6),GRT(AI_LT101_mA,21.0)]TON(LT101_FltTmr,?,?);]]>
+</Text>
+</Rung>
+<Rung Number="2" Type="N">
+<Text>
+<![CDATA[XIC(LT101_FltTmr.DN)OTE(LT101_Fault);]]>
+</Text>
+</Rung>
+<Rung Number="3" Type="N">
+<Comment>
+<![CDATA[Disagreement limits: transmitter must read below AllOff + 10 % when the low float is low, and above HighAlm - 10 % when the high-high float is high.]]>
+</Comment>
+<Text>
+<![CDATA[ADD(SPV_AllOff,10.0,LT_DisLoLim)SUB(SPV_HighAlm,10.0,LT_DisHiLim);]]>
+</Text>
+</Rung>
+<Rung Number="4" Type="N">
+<Comment>
+<![CDATA[A stuck transmitter is caught by the floats within 5 s and latched; operator resets from the HMI once the readings agree.]]>
+</Comment>
+<Text>
+<![CDATA[[XIO(DI_LSL)GRT(LT101_Pct,LT_DisLoLim),XIO(DI_LSHH)LES(LT101_Pct,LT_DisHiLim)]TON(LT_Dis_Tmr,?,?);]]>
+</Text>
+</Rung>
+<Rung Number="5" Type="N">
+<Text>
+<![CDATA[XIC(LT_Dis_Tmr.DN)OTL(LT_Disagree);]]>
+</Text>
+</Rung>
+<Rung Number="6" Type="N">
+<Text>
+<![CDATA[XIC(HMI_LTReset)XIO(LT_Dis_Tmr.DN)OTU(LT_Disagree);]]>
+</Text>
+</Rung>
+<Rung Number="7" Type="N">
+<Text>
+<![CDATA[XIC(HMI_LTReset)OTU(HMI_LTReset);]]>
+</Text>
+</Rung>
+<Rung Number="8" Type="N">
+<Comment>
+<![CDATA[Transmitter unusable: control falls back to the floats.]]>
+</Comment>
+<Text>
+<![CDATA[[XIC(LT101_Fault),XIC(LT_Disagree)]OTE(LT101_Bad);]]>
+</Text>
+</Rung>
+<Rung Number="9" Type="N">
+<Comment>
+<![CDATA[HMI setpoint checks: each band at least 5 % apart, alarm above lag start, all within 5-95 %.]]>
+</Comment>
+<Text>
+<![CDATA[ADD(SP_AllOff,5.0,SP_Chk1)ADD(SP_LeadOn,5.0,SP_Chk2);]]>
+</Text>
+</Rung>
+<Rung Number="10" Type="N">
+<Text>
+<![CDATA[GEQ(SP_LeadOn,SP_Chk1)GEQ(SP_LagOn,SP_Chk2)GRT(SP_HighAlm,SP_LagOn)LIM(5.0,SP_AllOff,95.0)LIM(5.0,SP_HighAlm,95.0)OTE(SP_Valid);]]>
+</Text>
+</Rung>
+<Rung Number="11" Type="N">
+<Comment>
+<![CDATA[Only validated setpoints reach the control logic; a bad entry keeps the last good set and raises ALM_SPInvalid.]]>
+</Comment>
+<Text>
+<![CDATA[XIC(SP_Valid)MOV(SP_LeadOn,SPV_LeadOn)MOV(SP_LagOn,SPV_LagOn)MOV(SP_AllOff,SPV_AllOff)MOV(SP_HighAlm,SPV_HighAlm);]]>
+</Text>
+</Rung>
+</RLLContent>
+</Routine>
+<Routine Name="R03_LeadLag" Type="RLL">
+<Description>
+<![CDATA[Level control, float backup, alternation, lead assignment]]>
+</Description>
+<RLLContent>
+<Rung Number="0" Type="N">
+<Comment>
+<![CDATA[Lead demand from the transmitter: on at LeadOn, sealed in until AllOff.]]>
+</Comment>
+<Text>
+<![CDATA[XIO(LT101_Bad)[GEQ(LT101_Pct,SPV_LeadOn),XIC(Lead_Dmd)GRT(LT101_Pct,SPV_AllOff)]OTE(Lead_Dmd);]]>
+</Text>
+</Rung>
+<Rung Number="1" Type="N">
+<Comment>
+<![CDATA[Lag demand from the transmitter: on at LagOn, sealed in until AllOff.]]>
+</Comment>
+<Text>
+<![CDATA[XIO(LT101_Bad)[GEQ(LT101_Pct,SPV_LagOn),XIC(Lag_Dmd)GRT(LT101_Pct,SPV_AllOff)]OTE(Lag_Dmd);]]>
+</Text>
+</Rung>
+<Rung Number="2" Type="N">
+<Comment>
+<![CDATA[Float backup (transmitter bad): both pumps from the high-high float down to the low float.]]>
+</Comment>
+<Text>
+<![CDATA[XIC(LT101_Bad)XIO(DI_LSHH)OTL(Bkp_Dmd);]]>
+</Text>
+</Rung>
+<Rung Number="3" Type="N">
+<Text>
+<![CDATA[[XIO(LT101_Bad),XIO(DI_LSL)]OTU(Bkp_Dmd);]]>
+</Text>
+</Rung>
+<Rung Number="4" Type="N">
+<Comment>
+<![CDATA[Low float is a hard cut-out for both modes (dry-run protection).]]>
+</Comment>
+<Text>
+<![CDATA[[XIC(Lead_Dmd),XIC(Bkp_Dmd)]XIC(DI_LSL)OTE(Lead_Call);]]>
+</Text>
+</Rung>
+<Rung Number="5" Type="N">
+<Comment>
+<![CDATA[Lag starts 3 s after the lead call to stagger inrush.]]>
+</Comment>
+<Text>
+<![CDATA[[XIC(Lag_Dmd),XIC(Bkp_Dmd)]XIC(DI_LSL)XIC(Lead_Call)TON(Lag_Stagger,?,?);]]>
+</Text>
+</Rung>
+<Rung Number="6" Type="N">
+<Text>
+<![CDATA[XIC(Lag_Stagger.DN)OTE(Lag_Call);]]>
+</Text>
+</Rung>
+<Rung Number="7" Type="N">
+<Comment>
+<![CDATA[Alternate at the end of every lead cycle (falling edge of Lead_Call).]]>
+</Comment>
+<Text>
+<![CDATA[XIC(Lead_Call)OSF(Alt_OSF_Sto,Alt_Pulse);]]>
+</Text>
+</Rung>
+<Rung Number="8" Type="N">
+<Text>
+<![CDATA[XIC(Alt_Pulse)ADD(Lead_Idx,1,Lead_Idx);]]>
+</Text>
+</Rung>
+<Rung Number="9" Type="N">
+<Text>
+<![CDATA[GEQ(Lead_Idx,2)MOV(0,Lead_Idx);]]>
+</Text>
+</Rung>
+<Rung Number="10" Type="N">
+<Comment>
+<![CDATA[Effective lead: the alternator's choice if available, otherwise the other pump (automatic fail-over).]]>
+</Comment>
+<Text>
+<![CDATA[[EQU(Lead_Idx,0)XIC(P1.Avail),EQU(Lead_Idx,1)XIO(P2.Avail)]OTE(P1_IsLead);]]>
+</Text>
+</Rung>
+<Rung Number="11" Type="N">
+<Text>
+<![CDATA[XIO(P1_IsLead)OTE(P2_IsLead);]]>
+</Text>
+</Rung>
+<Rung Number="12" Type="N">
+<Comment>
+<![CDATA[Pump calls: lead call to the effective lead, lag call to the other pump.]]>
+</Comment>
+<Text>
+<![CDATA[[XIC(Lead_Call)XIC(P1_IsLead),XIC(Lag_Call)XIC(P2_IsLead)]OTE(P1.Call);]]>
+</Text>
+</Rung>
+<Rung Number="13" Type="N">
+<Text>
+<![CDATA[[XIC(Lead_Call)XIC(P2_IsLead),XIC(Lag_Call)XIC(P1_IsLead)]OTE(P2.Call);]]>
+</Text>
+</Rung>
+</RLLContent>
+</Routine>
+<Routine Name="R10_Pump1" Type="RLL">
+<Description>
+<![CDATA[Pump P-101]]>
+</Description>
+<RLLContent>
+<Rung Number="0" Type="N">
+<Comment>
+<![CDATA[P1 fault: failed to start. Run command present but no contactor feedback within FTS_Tmr (5 s).]]>
+</Comment>
+<Text>
+<![CDATA[XIC(P1.Cmd_Run)XIO(P1.RunFbk)TON(P1.FTS_Tmr,?,?);]]>
+</Text>
+</Rung>
+<Rung Number="1" Type="N">
+<Text>
+<![CDATA[XIC(P1.FTS_Tmr.DN)OTL(P1.Flt_FTS);]]>
+</Text>
+</Rung>
+<Rung Number="2" Type="N">
+<Comment>
+<![CDATA[P1 fault: overload relay tripped.]]>
+</Comment>
+<Text>
+<![CDATA[XIC(P1.OL_Trip)OTL(P1.Flt_OL);]]>
+</Text>
+</Rung>
+<Rung Number="3" Type="N">
+<Comment>
+<![CDATA[P1 fault reset from HMI. Refused while the overload is still tripped. The request bit is always cleared by the PLC (handshake), so a lost HMI connection cannot leave it set.]]>
+</Comment>
+<Text>
+<![CDATA[XIC(P1.HMI_Reset)XIO(P1.OL_Trip)[OTU(P1.Flt_FTS),OTU(P1.Flt_OL)];]]>
+</Text>
+</Rung>
+<Rung Number="4" Type="N">
+<Text>
+<![CDATA[XIC(P1.HMI_Reset)OTU(P1.HMI_Reset);]]>
+</Text>
+</Rung>
+<Rung Number="5" Type="N">
+<Comment>
+<![CDATA[P1 fault summary (after the reset rungs, so a reset takes effect in the same scan). Uncommanded run is alarm-only and does not remove the pump from service.]]>
+</Comment>
+<Text>
+<![CDATA[[XIC(P1.Flt_FTS),XIC(P1.Flt_OL)]OTE(P1.Fault);]]>
+</Text>
+</Rung>
+<Rung Number="6" Type="N">
+<Comment>
+<![CDATA[P1 available for automatic control: AUTO, no latched fault, not taken out of service on the HMI.]]>
+</Comment>
+<Text>
+<![CDATA[XIC(P1.HOA_Auto)XIO(P1.Fault)XIO(P1.HMI_OOS)OTE(P1.Avail);]]>
+</Text>
+</Rung>
+<Rung Number="7" Type="N">
+<Comment>
+<![CDATA[P1 run command (AUTO only; HAND is hardwired at the starter).]]>
+</Comment>
+<Text>
+<![CDATA[XIC(P1.Call)XIC(P1.Avail)OTE(P1.Cmd_Run);]]>
+</Text>
+</Rung>
+<Rung Number="8" Type="N">
+<Comment>
+<![CDATA[P1 running without a command in AUTO (welded contactor, wiring fault) for 3 s.]]>
+</Comment>
+<Text>
+<![CDATA[XIC(P1.RunFbk)XIO(P1.Cmd_Run)XIO(P1.HOA_Hand)TON(P1.Uncmd_Tmr,?,?);]]>
+</Text>
+</Rung>
+<Rung Number="9" Type="N">
+<Text>
+<![CDATA[XIC(P1.Uncmd_Tmr.DN)OTE(P1.Flt_Uncmd);]]>
+</Text>
+</Rung>
+<Rung Number="10" Type="N">
+<Comment>
+<![CDATA[P1 start counter: one count per start, on the feedback rising edge.]]>
+</Comment>
+<Text>
+<![CDATA[XIC(P1.RunFbk)ONS(P1.Start_ONS)ADD(P1.Starts,1,P1.Starts);]]>
+</Text>
+</Rung>
+</RLLContent>
+</Routine>
+<Routine Name="R11_Pump2" Type="RLL">
+<Description>
+<![CDATA[Pump P-102]]>
+</Description>
+<RLLContent>
+<Rung Number="0" Type="N">
+<Comment>
+<![CDATA[P2 fault: failed to start. Run command present but no contactor feedback within FTS_Tmr (5 s).]]>
+</Comment>
+<Text>
+<![CDATA[XIC(P2.Cmd_Run)XIO(P2.RunFbk)TON(P2.FTS_Tmr,?,?);]]>
+</Text>
+</Rung>
+<Rung Number="1" Type="N">
+<Text>
+<![CDATA[XIC(P2.FTS_Tmr.DN)OTL(P2.Flt_FTS);]]>
+</Text>
+</Rung>
+<Rung Number="2" Type="N">
+<Comment>
+<![CDATA[P2 fault: overload relay tripped.]]>
+</Comment>
+<Text>
+<![CDATA[XIC(P2.OL_Trip)OTL(P2.Flt_OL);]]>
+</Text>
+</Rung>
+<Rung Number="3" Type="N">
+<Comment>
+<![CDATA[P2 fault reset from HMI. Refused while the overload is still tripped. The request bit is always cleared by the PLC (handshake), so a lost HMI connection cannot leave it set.]]>
+</Comment>
+<Text>
+<![CDATA[XIC(P2.HMI_Reset)XIO(P2.OL_Trip)[OTU(P2.Flt_FTS),OTU(P2.Flt_OL)];]]>
+</Text>
+</Rung>
+<Rung Number="4" Type="N">
+<Text>
+<![CDATA[XIC(P2.HMI_Reset)OTU(P2.HMI_Reset);]]>
+</Text>
+</Rung>
+<Rung Number="5" Type="N">
+<Comment>
+<![CDATA[P2 fault summary (after the reset rungs, so a reset takes effect in the same scan). Uncommanded run is alarm-only and does not remove the pump from service.]]>
+</Comment>
+<Text>
+<![CDATA[[XIC(P2.Flt_FTS),XIC(P2.Flt_OL)]OTE(P2.Fault);]]>
+</Text>
+</Rung>
+<Rung Number="6" Type="N">
+<Comment>
+<![CDATA[P2 available for automatic control: AUTO, no latched fault, not taken out of service on the HMI.]]>
+</Comment>
+<Text>
+<![CDATA[XIC(P2.HOA_Auto)XIO(P2.Fault)XIO(P2.HMI_OOS)OTE(P2.Avail);]]>
+</Text>
+</Rung>
+<Rung Number="7" Type="N">
+<Comment>
+<![CDATA[P2 run command (AUTO only; HAND is hardwired at the starter).]]>
+</Comment>
+<Text>
+<![CDATA[XIC(P2.Call)XIC(P2.Avail)OTE(P2.Cmd_Run);]]>
+</Text>
+</Rung>
+<Rung Number="8" Type="N">
+<Comment>
+<![CDATA[P2 running without a command in AUTO (welded contactor, wiring fault) for 3 s.]]>
+</Comment>
+<Text>
+<![CDATA[XIC(P2.RunFbk)XIO(P2.Cmd_Run)XIO(P2.HOA_Hand)TON(P2.Uncmd_Tmr,?,?);]]>
+</Text>
+</Rung>
+<Rung Number="9" Type="N">
+<Text>
+<![CDATA[XIC(P2.Uncmd_Tmr.DN)OTE(P2.Flt_Uncmd);]]>
+</Text>
+</Rung>
+<Rung Number="10" Type="N">
+<Comment>
+<![CDATA[P2 start counter: one count per start, on the feedback rising edge.]]>
+</Comment>
+<Text>
+<![CDATA[XIC(P2.RunFbk)ONS(P2.Start_ONS)ADD(P2.Starts,1,P2.Starts);]]>
+</Text>
+</Rung>
+</RLLContent>
+</Routine>
+<Routine Name="R20_Alarms" Type="RLL">
+<Description>
+<![CDATA[Alarm conditions, template, acknowledge, beacon]]>
+</Description>
+<RLLContent>
+<Rung Number="0" Type="N">
+<Comment>
+<![CDATA[High level from the transmitter, or high-high float (always).]]>
+</Comment>
+<Text>
+<![CDATA[[GEQ(LT101_Pct,SPV_HighAlm)XIO(LT101_Bad),XIO(DI_LSHH)]OTE(ALM_HighLevel.Cond);]]>
+</Text>
+</Rung>
+<Rung Number="1" Type="N">
+<Text>
+<![CDATA[XIO(DI_LSHH)OTE(ALM_HiHiFloat.Cond);]]>
+</Text>
+</Rung>
+<Rung Number="2" Type="N">
+<Text>
+<![CDATA[XIC(LT101_Bad)OTE(ALM_LT101.Cond);]]>
+</Text>
+</Rung>
+<Rung Number="3" Type="N">
+<Text>
+<![CDATA[XIC(P1.Fault)OTE(ALM_P1_Fault.Cond);]]>
+</Text>
+</Rung>
+<Rung Number="4" Type="N">
+<Text>
+<![CDATA[XIC(P2.Fault)OTE(ALM_P2_Fault.Cond);]]>
+</Text>
+</Rung>
+<Rung Number="5" Type="N">
+<Text>
+<![CDATA[XIC(P1.Flt_Uncmd)OTE(ALM_P1_Uncmd.Cond);]]>
+</Text>
+</Rung>
+<Rung Number="6" Type="N">
+<Text>
+<![CDATA[XIC(P2.Flt_Uncmd)OTE(ALM_P2_Uncmd.Cond);]]>
+</Text>
+</Rung>
+<Rung Number="7" Type="N">
+<Text>
+<![CDATA[XIO(P1.Avail)XIO(P2.Avail)OTE(ALM_NoPump.Cond);]]>
+</Text>
+</Rung>
+<Rung Number="8" Type="N">
+<Text>
+<![CDATA[XIO(SP_Valid)OTE(ALM_SPInvalid.Cond);]]>
+</Text>
+</Rung>
+<Rung Number="9" Type="N">
+<Comment>
+<![CDATA[Alarm template, repeated per alarm: on-delay, active, and a new-alarm edge that sets Unack.]]>
+</Comment>
+<Text>
+<![CDATA[XIC(ALM_HighLevel.Cond)TON(ALM_HighLevel.Dly,?,?);]]>
+</Text>
+</Rung>
+<Rung Number="10" Type="N">
+<Text>
+<![CDATA[XIC(ALM_HighLevel.Dly.DN)OTE(ALM_HighLevel.Active);]]>
+</Text>
+</Rung>
+<Rung Number="11" Type="N">
+<Text>
+<![CDATA[XIC(ALM_HighLevel.Active)ONS(ALM_HighLevel.Edge_ONS)OTL(ALM_HighLevel.Unack);]]>
+</Text>
+</Rung>
+<Rung Number="12" Type="N">
+<Text>
+<![CDATA[XIC(HMI_AckAll)OTU(ALM_HighLevel.Unack);]]>
+</Text>
+</Rung>
+<Rung Number="13" Type="N">
+<Text>
+<![CDATA[XIC(ALM_HiHiFloat.Cond)TON(ALM_HiHiFloat.Dly,?,?);]]>
+</Text>
+</Rung>
+<Rung Number="14" Type="N">
+<Text>
+<![CDATA[XIC(ALM_HiHiFloat.Dly.DN)OTE(ALM_HiHiFloat.Active);]]>
+</Text>
+</Rung>
+<Rung Number="15" Type="N">
+<Text>
+<![CDATA[XIC(ALM_HiHiFloat.Active)ONS(ALM_HiHiFloat.Edge_ONS)OTL(ALM_HiHiFloat.Unack);]]>
+</Text>
+</Rung>
+<Rung Number="16" Type="N">
+<Text>
+<![CDATA[XIC(HMI_AckAll)OTU(ALM_HiHiFloat.Unack);]]>
+</Text>
+</Rung>
+<Rung Number="17" Type="N">
+<Text>
+<![CDATA[XIC(ALM_LT101.Cond)TON(ALM_LT101.Dly,?,?);]]>
+</Text>
+</Rung>
+<Rung Number="18" Type="N">
+<Text>
+<![CDATA[XIC(ALM_LT101.Dly.DN)OTE(ALM_LT101.Active);]]>
+</Text>
+</Rung>
+<Rung Number="19" Type="N">
+<Text>
+<![CDATA[XIC(ALM_LT101.Active)ONS(ALM_LT101.Edge_ONS)OTL(ALM_LT101.Unack);]]>
+</Text>
+</Rung>
+<Rung Number="20" Type="N">
+<Text>
+<![CDATA[XIC(HMI_AckAll)OTU(ALM_LT101.Unack);]]>
+</Text>
+</Rung>
+<Rung Number="21" Type="N">
+<Text>
+<![CDATA[XIC(ALM_P1_Fault.Cond)TON(ALM_P1_Fault.Dly,?,?);]]>
+</Text>
+</Rung>
+<Rung Number="22" Type="N">
+<Text>
+<![CDATA[XIC(ALM_P1_Fault.Dly.DN)OTE(ALM_P1_Fault.Active);]]>
+</Text>
+</Rung>
+<Rung Number="23" Type="N">
+<Text>
+<![CDATA[XIC(ALM_P1_Fault.Active)ONS(ALM_P1_Fault.Edge_ONS)OTL(ALM_P1_Fault.Unack);]]>
+</Text>
+</Rung>
+<Rung Number="24" Type="N">
+<Text>
+<![CDATA[XIC(HMI_AckAll)OTU(ALM_P1_Fault.Unack);]]>
+</Text>
+</Rung>
+<Rung Number="25" Type="N">
+<Text>
+<![CDATA[XIC(ALM_P2_Fault.Cond)TON(ALM_P2_Fault.Dly,?,?);]]>
+</Text>
+</Rung>
+<Rung Number="26" Type="N">
+<Text>
+<![CDATA[XIC(ALM_P2_Fault.Dly.DN)OTE(ALM_P2_Fault.Active);]]>
+</Text>
+</Rung>
+<Rung Number="27" Type="N">
+<Text>
+<![CDATA[XIC(ALM_P2_Fault.Active)ONS(ALM_P2_Fault.Edge_ONS)OTL(ALM_P2_Fault.Unack);]]>
+</Text>
+</Rung>
+<Rung Number="28" Type="N">
+<Text>
+<![CDATA[XIC(HMI_AckAll)OTU(ALM_P2_Fault.Unack);]]>
+</Text>
+</Rung>
+<Rung Number="29" Type="N">
+<Text>
+<![CDATA[XIC(ALM_P1_Uncmd.Cond)TON(ALM_P1_Uncmd.Dly,?,?);]]>
+</Text>
+</Rung>
+<Rung Number="30" Type="N">
+<Text>
+<![CDATA[XIC(ALM_P1_Uncmd.Dly.DN)OTE(ALM_P1_Uncmd.Active);]]>
+</Text>
+</Rung>
+<Rung Number="31" Type="N">
+<Text>
+<![CDATA[XIC(ALM_P1_Uncmd.Active)ONS(ALM_P1_Uncmd.Edge_ONS)OTL(ALM_P1_Uncmd.Unack);]]>
+</Text>
+</Rung>
+<Rung Number="32" Type="N">
+<Text>
+<![CDATA[XIC(HMI_AckAll)OTU(ALM_P1_Uncmd.Unack);]]>
+</Text>
+</Rung>
+<Rung Number="33" Type="N">
+<Text>
+<![CDATA[XIC(ALM_P2_Uncmd.Cond)TON(ALM_P2_Uncmd.Dly,?,?);]]>
+</Text>
+</Rung>
+<Rung Number="34" Type="N">
+<Text>
+<![CDATA[XIC(ALM_P2_Uncmd.Dly.DN)OTE(ALM_P2_Uncmd.Active);]]>
+</Text>
+</Rung>
+<Rung Number="35" Type="N">
+<Text>
+<![CDATA[XIC(ALM_P2_Uncmd.Active)ONS(ALM_P2_Uncmd.Edge_ONS)OTL(ALM_P2_Uncmd.Unack);]]>
+</Text>
+</Rung>
+<Rung Number="36" Type="N">
+<Text>
+<![CDATA[XIC(HMI_AckAll)OTU(ALM_P2_Uncmd.Unack);]]>
+</Text>
+</Rung>
+<Rung Number="37" Type="N">
+<Text>
+<![CDATA[XIC(ALM_NoPump.Cond)TON(ALM_NoPump.Dly,?,?);]]>
+</Text>
+</Rung>
+<Rung Number="38" Type="N">
+<Text>
+<![CDATA[XIC(ALM_NoPump.Dly.DN)OTE(ALM_NoPump.Active);]]>
+</Text>
+</Rung>
+<Rung Number="39" Type="N">
+<Text>
+<![CDATA[XIC(ALM_NoPump.Active)ONS(ALM_NoPump.Edge_ONS)OTL(ALM_NoPump.Unack);]]>
+</Text>
+</Rung>
+<Rung Number="40" Type="N">
+<Text>
+<![CDATA[XIC(HMI_AckAll)OTU(ALM_NoPump.Unack);]]>
+</Text>
+</Rung>
+<Rung Number="41" Type="N">
+<Text>
+<![CDATA[XIC(ALM_SPInvalid.Cond)TON(ALM_SPInvalid.Dly,?,?);]]>
+</Text>
+</Rung>
+<Rung Number="42" Type="N">
+<Text>
+<![CDATA[XIC(ALM_SPInvalid.Dly.DN)OTE(ALM_SPInvalid.Active);]]>
+</Text>
+</Rung>
+<Rung Number="43" Type="N">
+<Text>
+<![CDATA[XIC(ALM_SPInvalid.Active)ONS(ALM_SPInvalid.Edge_ONS)OTL(ALM_SPInvalid.Unack);]]>
+</Text>
+</Rung>
+<Rung Number="44" Type="N">
+<Text>
+<![CDATA[XIC(HMI_AckAll)OTU(ALM_SPInvalid.Unack);]]>
+</Text>
+</Rung>
+<Rung Number="45" Type="N">
+<Comment>
+<![CDATA[Acknowledge handshake: the PLC clears the HMI request after use.]]>
+</Comment>
+<Text>
+<![CDATA[XIC(HMI_AckAll)OTU(HMI_AckAll);]]>
+</Text>
+</Rung>
+<Rung Number="46" Type="N">
+<Comment>
+<![CDATA[Beacon while any alarm is unacknowledged.]]>
+</Comment>
+<Text>
+<![CDATA[[XIC(ALM_HighLevel.Unack),XIC(ALM_HiHiFloat.Unack),XIC(ALM_LT101.Unack),XIC(ALM_P1_Fault.Unack),XIC(ALM_P2_Fault.Unack),XIC(ALM_P1_Uncmd.Unack),XIC(ALM_P2_Uncmd.Unack),XIC(ALM_NoPump.Unack),XIC(ALM_SPInvalid.Unack)]OTE(ALM_AnyUnack);]]>
+</Text>
+</Rung>
+</RLLContent>
+</Routine>
+<Routine Name="R30_Outputs" Type="RLL">
+<Description>
+<![CDATA[Output mapping]]>
+</Description>
+<RLLContent>
+<Rung Number="0" Type="N">
+<Comment>
+<![CDATA[Map outputs once, here. Replace DO_ placeholders with module tags at commissioning.]]>
+</Comment>
+<Text>
+<![CDATA[XIC(P1.Cmd_Run)OTE(DO_P1_Run);]]>
+</Text>
+</Rung>
+<Rung Number="1" Type="N">
+<Text>
+<![CDATA[XIC(P2.Cmd_Run)OTE(DO_P2_Run);]]>
+</Text>
+</Rung>
+<Rung Number="2" Type="N">
+<Text>
+<![CDATA[XIC(ALM_AnyUnack)OTE(DO_Beacon);]]>
+</Text>
+</Rung>
+</RLLContent>
+</Routine>
+</Routines>
+</Program>
+<Program Name="Totals" TestEdits="false" MainRoutineName="R00_Totals" Disabled="false" UseAsFolder="false">
+<Tags/>
+<Routines>
+<Routine Name="R00_Totals" Type="RLL">
+<Description>
+<![CDATA[Runs every 1000 ms in periodic task T1000ms]]>
+</Description>
+<RLLContent>
+<Rung Number="0" Type="N">
+<Comment>
+<![CDATA[Run seconds counted in a 1 s periodic task: exact, independent of continuous-task scan time (no self-resetting timer drift).]]>
+</Comment>
+<Text>
+<![CDATA[XIC(P1.RunFbk)ADD(P1.RunSec,1,P1.RunSec);]]>
+</Text>
+</Rung>
+<Rung Number="1" Type="N">
+<Text>
+<![CDATA[XIC(P2.RunFbk)ADD(P2.RunSec,1,P2.RunSec);]]>
+</Text>
+</Rung>
+<Rung Number="2" Type="N">
+<Text>
+<![CDATA[DIV(P1.RunSec,3600.0,P1.RunHrs)DIV(P2.RunSec,3600.0,P2.RunHrs);]]>
+</Text>
+</Rung>
+</RLLContent>
+</Routine>
+</Routines>
+</Program>
+</Programs>
+<Tasks>
+<Task Name="MainTask" Type="CONTINUOUS" Priority="10" Watchdog="500" DisableUpdateOutputs="false" InhibitTask="false">
+<ScheduledPrograms>
+<ScheduledProgram Name="MainProgram"/>
+</ScheduledPrograms>
+</Task>
+<Task Name="T1000ms" Type="PERIODIC" Rate="1000" Priority="5" Watchdog="500" DisableUpdateOutputs="false" InhibitTask="false">
+<ScheduledPrograms>
+<ScheduledProgram Name="Totals"/>
+</ScheduledPrograms>
+</Task>
+</Tasks>
+</Controller>
+</RSLogix5000Content>

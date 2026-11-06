@@ -1,0 +1,21 @@
+{
+  "name": "ls01-lift-station-logix",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Studio 5000 ladder program (L5X) for a duplex lift station, with scan engine, plant model, scenario tests, mutation testing, linter and review site.",
+  "scripts": {
+    "build": "node tools/build_l5x.js",
+    "test": "node --test test/liftstation.test.js",
+    "lint": "node tools/lint.js LS01_LiftStation.L5X",
+    "mutate": "node tools/mutate.js",
+    "seeded": "node tools/seeded.js",
+    "site": "node tools/export_site.js",
+    "serve": "npx --yes serve site"
+  },
+  "dependencies": {
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@fontsource/ibm-plex-sans": "^5.3.0",
+    "@xmldom/xmldom": "^0.8.10"
+  },
+  "private": true
+}
